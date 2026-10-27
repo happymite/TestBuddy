@@ -199,6 +199,5 @@ cd TestBuddy
 
 ---
 
-## 📄 License
-
-This project is licensed under the MIT License.
+##owner 
+MD RAQUIF
