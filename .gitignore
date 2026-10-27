@@ -1,0 +1,32 @@
+# Environment secrets
+.env
+*.env
+backend/.env
+frontend/.env
+
+# Dependencies
+node_modules/
+backend/node_modules/
+frontend/node_modules/
+
+# Production build output
+dist/
+frontend/dist/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# AI agent and workspace tracking files
+.agents/
+CHANGES.md
+changes.md
+GEMINI.md
+gemini.md
+
+# OS and Editor junk
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
