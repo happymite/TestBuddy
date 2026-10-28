@@ -342,11 +342,13 @@ export async function getPublishedExams(req, res) {
     const offset = (page - 1) * limit;
 
     const result = await pool.query(
-      `SELECT id, title, description, duration_minutes,
-              total_marks, starts_at, ends_at, created_at, access_mode
-       FROM public.exams
-       WHERE is_published = true
-       ORDER BY created_at DESC, id DESC
+      `SELECT e.id, e.title, e.description, e.duration_minutes,
+              e.total_marks, e.starts_at, e.ends_at, e.created_at, e.access_mode,
+              e.subject_id, s.name AS subject_name
+       FROM public.exams e
+       LEFT JOIN public.subjects s ON s.id = e.subject_id
+       WHERE e.is_published = true
+       ORDER BY e.created_at DESC, e.id DESC
        LIMIT $1 OFFSET $2`,
       [limit, offset],
     );
