@@ -19,11 +19,12 @@ export default function QuestionCard({
 
       <h2 className="question-text">{question.question_text}</h2>
 
-      {/* Question-level image (optional) */}
       {question.question_image_url && (
         <img
           src={question.question_image_url}
           alt="Question image"
+          loading="lazy"
+          decoding="async"
           style={{
             display: "block",
             maxWidth: "100%",
@@ -54,13 +55,14 @@ export default function QuestionCard({
                 onChange={() => onSelect(letter)}
               />
               <span className="option-letter">{letter}.</span>
-              {/* Wrap text + image together so they stack vertically */}
               <span className="option-body">
                 <span>{optionText}</span>
                 {optionImageUrl && (
                   <img
                     src={optionImageUrl}
                     alt={`Option ${letter}`}
+                    loading="lazy"
+                    decoding="async"
                     style={{
                       display: "block",
                       maxWidth: "100%",

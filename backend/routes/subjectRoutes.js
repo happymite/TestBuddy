@@ -1,12 +1,14 @@
 import { Router } from "express";
-import { authenticateToken, requireTeacher } from "../middlewares/authMiddleware.js";
+import { authenticateToken, requireAdmin } from "../middlewares/authMiddleware.js";
 import { getMySubjects, createSubject, deleteSubject } from "../controllers/subjectController.js";
 
 const router = Router();
 
-// All subject routes require a teacher token.
-router.get("/", authenticateToken, requireTeacher, getMySubjects);
-router.post("/", authenticateToken, requireTeacher, createSubject);
-router.delete("/:subjectId", authenticateToken, requireTeacher, deleteSubject);
+// Allow authenticated users to list subject categories
+router.get("/", authenticateToken, getMySubjects);
+
+// Admin-only endpoints to manage subject categories
+router.post("/", authenticateToken, requireAdmin, createSubject);
+router.delete("/:subjectId", authenticateToken, requireAdmin, deleteSubject);
 
 export default router;

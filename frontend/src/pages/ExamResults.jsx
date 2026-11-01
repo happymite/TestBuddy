@@ -4,7 +4,6 @@ import { getExamResults } from "../api/teacher.js";
 
 export default function ExamResults() {
   const { examId } = useParams();
-
   const [exam, setExam] = useState(null);
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -17,8 +16,6 @@ export default function ExamResults() {
       .then((data) => {
         if (cancelled) return;
         setExam(data.exam);
-        // Sort by score descending for rank display.
-        // Unsubmitted attempts go to the bottom.
         const sorted = [...data.results].sort((a, b) => {
           if (b.score === null && a.score === null) return 0;
           if (b.score === null) return -1;
@@ -39,27 +36,29 @@ export default function ExamResults() {
     };
   }, [examId]);
 
-  if (loading) return <p>Loading results...</p>;
+  if (loading) return <div className="page"><p>Loading results...</p></div>;
 
-  if (error) {
+  if (error || !exam) {
     return (
-      <div>
+      <div className="page">
         <p className="error" role="alert">
-          {error}
+          {error || "Exam not found."}
         </p>
-        <Link to="/teacher">Back to my exams</Link>
+        <Link to="/admin" className="button-link secondary">
+          &larr; Back to Admin Dashboard
+        </Link>
       </div>
     );
   }
 
   return (
     <div>
-      <p>
-        <Link to="/teacher">← Back to my exams</Link>
+      <p style={{ marginBottom: "1rem" }}>
+        <Link to="/admin">&larr; Back to Admin Dashboard</Link>
       </p>
 
       <div className="page-header">
-        <h1>Results — {exam.title}</h1>
+        <h1>Results &mdash; {exam.title}</h1>
       </div>
 
       <ul className="exam-meta">
@@ -68,7 +67,7 @@ export default function ExamResults() {
       </ul>
 
       {results.length === 0 ? (
-        <p>No attempts yet.</p>
+        <p className="empty-state">No student attempts recorded for this exam yet.</p>
       ) : (
         <div style={{ overflowX: "auto" }}>
           <table className="results-table">
@@ -96,17 +95,9 @@ export default function ExamResults() {
                     <td>{r.name ?? r.email ?? "Guest"}</td>
                     <td>{r.candidate_type}</td>
                     <td>{r.status}</td>
-                    <td>
-                      {r.score !== null
-                        ? `${r.score} / ${r.total_marks}`
-                        : "—"}
-                    </td>
-                    <td>{pct !== "—" ? `${pct}%` : "—"}</td>
-                    <td>
-                      {r.submitted_at
-                        ? new Date(r.submitted_at).toLocaleString()
-                        : "—"}
-                    </td>
+                    <td>{r.score !== null ? `${r.score} / ${r.total_marks}` : "—"}</td>
+                    <td>{pct}{pct !== "—" ? "%" : ""}</td>
+                    <td>{r.submitted_at ? new Date(r.submitted_at).toLocaleString() : "In progress"}</td>
                   </tr>
                 );
               })}

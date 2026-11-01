@@ -83,8 +83,8 @@ export async function getExamResults(req, res) {
     const examResult = await pool.query(
       `SELECT id, title, total_marks, is_published, access_mode
        FROM public.exams
-       WHERE id = $1 AND created_by = $2`,
-      [examId, req.user.id],
+       WHERE id = $1 AND ($2 = true OR created_by = $3)`,
+      [examId, req.user?.role === 'admin', req.user.id],
     );
 
     if (examResult.rows.length === 0) {
