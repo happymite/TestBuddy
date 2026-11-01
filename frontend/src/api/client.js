@@ -1,9 +1,16 @@
-
 const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 const TOKEN_KEY = "testbuddy_token";
+const ADMIN_TOKEN_KEY = "testbuddy_admin_token";
 
 export function getToken() {
-  return localStorage.getItem(TOKEN_KEY);
+  const isAdminPath =
+    typeof window !== "undefined" &&
+    (window.location.pathname.startsWith("/admin") ||
+      window.location.pathname.startsWith("/teacher"));
+  if (isAdminPath) {
+    return localStorage.getItem(ADMIN_TOKEN_KEY) || localStorage.getItem(TOKEN_KEY);
+  }
+  return localStorage.getItem(TOKEN_KEY) || localStorage.getItem(ADMIN_TOKEN_KEY);
 }
 
 export function setToken(token) {
@@ -65,17 +72,24 @@ export async function request(
   }
 
   let data = null;
-
   try {
     data = await response.json();
   } catch {
-    // The response may have an empty or non-JSON body.
+    // empty response body
   }
 
   if (!response.ok) {
     if (response.status === 401 && token) {
-      clearToken();
-      onUnauthorized?.();
+      if (
+        typeof window !== "undefined" &&
+        (window.location.pathname.startsWith("/admin") ||
+          window.location.pathname.startsWith("/teacher"))
+      ) {
+        localStorage.removeItem(ADMIN_TOKEN_KEY);
+      } else {
+        clearToken();
+        onUnauthorized?.();
+      }
     }
 
     throw new ApiError(

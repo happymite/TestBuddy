@@ -1,4 +1,3 @@
-
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
@@ -8,6 +7,7 @@ import authRoutes from "./routes/authRoutes.js";
 import examRoutes from "./routes/examRoutes.js";
 import questionRoutes from "./routes/questionRoutes.js";
 import subjectRoutes from "./routes/subjectRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js";
 
 const app = express();
 
@@ -32,6 +32,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/exams", examRoutes);
 app.use("/api/exams", questionRoutes);
 app.use("/api/subjects", subjectRoutes);
+app.use("/api/admin", adminRoutes);
 
 // Convert upload errors into readable JSON responses.
 app.use((error, req, res, next) => {

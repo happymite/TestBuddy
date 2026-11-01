@@ -1,34 +1,27 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { getPublishedExams, startAttempt } from "../api/exam.js";
+import "./StudentDashboard.css";
 
-function formatDate(value) {
-  return new Date(value).toLocaleString();
-}
-
-// Display only. The browser clock can be wrong, so the server decides
-// whether you may actually start (it answers 403 if not).
 function scheduleLabel(exam) {
   const now = Date.now();
   if (exam.starts_at && new Date(exam.starts_at).getTime() > now) {
-    return `Opens ${formatDate(exam.starts_at)}`;
+    return `Opens ${new Date(exam.starts_at).toLocaleDateString()}`;
   }
   if (exam.ends_at && new Date(exam.ends_at).getTime() <= now) {
-    return `Closed ${formatDate(exam.ends_at)}`;
+    return `Closed ${new Date(exam.ends_at).toLocaleDateString()}`;
   }
-  if (exam.ends_at) return `Open until ${formatDate(exam.ends_at)}`;
-  return "Open anytime";
+  return "Available Now";
 }
 
-function ExamCard({ exam }) {
+function StudentExamCard({ exam }) {
   const navigate = useNavigate();
   const [starting, setStarting] = useState(false);
   const [error, setError] = useState("");
 
   async function handleStart() {
     const ok = window.confirm(
-      "Starting begins the timer right away and it cannot be paused. " +
-        "If you already have a running attempt, this resumes it. Continue?",
+      "Starting begins the timer immediately and cannot be paused. Continue?",
     );
     if (!ok) return;
 
@@ -36,9 +29,8 @@ function ExamCard({ exam }) {
     setStarting(true);
     try {
       const data = await startAttempt(exam.id);
-   navigate(`/attempts/${data.attempt.id}/take`);
+      navigate(`/attempts/${data.attempt.id}/take`);
     } catch (err) {
-      // Includes the server's "not started yet" / "has ended" messages.
       setError(err.message);
       setStarting(false);
     }
@@ -46,20 +38,25 @@ function ExamCard({ exam }) {
 
   return (
     <article className="exam-card">
-      <h2>{exam.title}</h2>
-      {exam.description && <p className="exam-desc">{exam.description}</p>}
+      <div className="exam-card-head">
+        <h3>{exam.title}</h3>
+        <span className="badge">{exam.access_mode || "graded"}</span>
+      </div>
+
+      {exam.description && (
+        <p className="exam-desc">{exam.description}</p>
+      )}
+
       <ul className="exam-meta">
-        <li>{exam.duration_minutes} minutes</li>
+        <li>{exam.duration_minutes} mins</li>
         <li>{exam.total_marks} marks</li>
         <li>{scheduleLabel(exam)}</li>
       </ul>
-      {error && (
-        <p className="error" role="alert">
-          {error}
-        </p>
-      )}
+
+      {error && <p className="error" role="alert">{error}</p>}
+
       <button onClick={handleStart} disabled={starting}>
-        {starting ? "Starting..." : "Start / Resume"}
+        {starting ? "Starting..." : "Start Assessment"}
       </button>
     </article>
   );
@@ -67,7 +64,6 @@ function ExamCard({ exam }) {
 
 export default function StudentDashboard() {
   const [page, setPage] = useState(1);
-  const [reloadKey, setReloadKey] = useState(0);
   const [exams, setExams] = useState([]);
   const [pagination, setPagination] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -75,11 +71,10 @@ export default function StudentDashboard() {
 
   useEffect(() => {
     let cancelled = false;
-
     getPublishedExams(page)
       .then((data) => {
         if (cancelled) return;
-        setExams(data.exams);
+        setExams(data.exams || []);
         setPagination(data.pagination);
         setLoading(false);
       })
@@ -88,59 +83,37 @@ export default function StudentDashboard() {
         setError(err.message);
         setLoading(false);
       });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [page, reloadKey]);
-
-  function goToPage(next) {
-    setLoading(true);
-    setError("");
-    setPage(next);
-  }
-
-  function retry() {
-    setLoading(true);
-    setError("");
-    setReloadKey((key) => key + 1);
-  }
+    return () => { cancelled = true; };
+  }, [page]);
 
   return (
     <div>
-      <h1>Available exams</h1>
+      <div className="page-header">
+        <h1>Available Exams</h1>
+      </div>
 
       {loading && <p>Loading exams...</p>}
+      {error && <p className="error" role="alert">{error}</p>}
 
-      {error && (
-        <div>
-          <p className="error" role="alert">
-            {error}
-          </p>
-          <button onClick={retry}>Try again</button>
+      {!loading && !error && exams.length === 0 && (
+        <p className="hint">No exams are published right now. Please check back later.</p>
+      )}
+
+      {!loading && !error && exams.length > 0 && (
+        <div className="exams-grid">
+          {exams.map((exam) => (
+            <StudentExamCard key={exam.id} exam={exam} />
+          ))}
         </div>
       )}
 
-      {!loading && !error && exams.length === 0 && (
-        <p>No exams are published yet.</p>
-      )}
-
-      {!loading &&
-        !error &&
-        exams.map((exam) => <ExamCard key={exam.id} exam={exam} />)}
-
       {!loading && !error && pagination && pagination.totalPages > 1 && (
-        <div className="pager">
-          <button disabled={page <= 1} onClick={() => goToPage(page - 1)}>
+        <div className="pager" style={{ marginTop: '1.5rem' }}>
+          <button disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>
             Previous
           </button>
-          <span>
-            Page {pagination.page} of {pagination.totalPages}
-          </span>
-          <button
-            disabled={page >= pagination.totalPages}
-            onClick={() => goToPage(page + 1)}
-          >
+          <span>Page {pagination.page} of {pagination.totalPages}</span>
+          <button disabled={page >= pagination.totalPages} onClick={() => setPage((p) => p + 1)}>
             Next
           </button>
         </div>

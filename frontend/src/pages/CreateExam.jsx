@@ -13,14 +13,13 @@ export default function CreateExam() {
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [accessMode, setAccessMode] = useState("graded");
-  const [subjectId, setSubjectId] = useState("");   // "" means no subject
+  const [subjectId, setSubjectId] = useState("");
   const [subjects, setSubjects] = useState([]);
 
-  // Load the teacher's subjects once on mount so they can assign one on creation.
   useEffect(() => {
     getMySubjects()
-      .then((data) => setSubjects(data.subjects))
-      .catch(() => {}); // non-fatal — field just shows empty dropdown
+      .then((data) => setSubjects(data.subjects || []))
+      .catch(() => {});
   }, []);
 
   function validate() {
@@ -28,22 +27,18 @@ export default function CreateExam() {
     if (!cleanTitle || cleanTitle.length > 200) {
       return "Title is required and must be 200 characters or fewer.";
     }
-
     const minutes = Number(duration);
     if (!Number.isInteger(minutes) || minutes < 1 || minutes > 180) {
       return "Duration must be a whole number between 1 and 180 minutes.";
     }
-
     if (startsAt && endsAt && new Date(endsAt) <= new Date(startsAt)) {
       return "End time must be after the start time.";
     }
-
     return "";
   }
 
   async function handleSubmit(event) {
     event.preventDefault();
-
     const problem = validate();
     if (problem) {
       setError(problem);
@@ -62,7 +57,7 @@ export default function CreateExam() {
         access_mode: accessMode,
         subject_id: subjectId ? Number(subjectId) : null,
       });
-      navigate(`/teacher/exams/${data.exam.id}`, { replace: true });
+      navigate(`/admin/exams/${data.exam.id}`, { replace: true });
     } catch (err) {
       setError(err.message);
       setSubmitting(false);
@@ -72,9 +67,9 @@ export default function CreateExam() {
   return (
     <div>
       <p>
-        <Link to="/teacher">Back to my exams</Link>
+        <Link to="/admin">&larr; Back to Admin Dashboard</Link>
       </p>
-      <h1>Create exam</h1>
+      <h1>Create New Assessment</h1>
 
       <form className="form-card" onSubmit={handleSubmit}>
         <div className="field">
@@ -99,9 +94,8 @@ export default function CreateExam() {
           />
         </div>
 
-        {/* Subject picker — only shown if the teacher has at least one subject */}
         <div className="field">
-          <label htmlFor="subjectId">Subject (optional)</label>
+          <label htmlFor="subjectId">Subject Category</label>
           <select
             id="subjectId"
             value={subjectId}
@@ -114,22 +108,17 @@ export default function CreateExam() {
               </option>
             ))}
           </select>
-          {subjects.length === 0 && (
-            <span className="hint">
-              Create a subject on the dashboard first to organise your exams.
-            </span>
-          )}
         </div>
 
         <div className="field">
-          <label htmlFor="accessMode">Exam access</label>
+          <label htmlFor="accessMode">Exam Access Mode</label>
           <select
             id="accessMode"
             value={accessMode}
             onChange={(e) => setAccessMode(e.target.value)}
           >
             <option value="graded">Graded — students must sign in</option>
-            <option value="practice">Practice — guests can participate</option>
+            <option value="practice">Practice — guests can take test</option>
           </select>
         </div>
 
@@ -167,11 +156,6 @@ export default function CreateExam() {
             />
           </div>
         </div>
-
-        <p className="hint">
-          Times use your computer's timezone. A student who starts close to the
-          closing time gets less than the full duration.
-        </p>
 
         {error && (
           <p className="error" role="alert">

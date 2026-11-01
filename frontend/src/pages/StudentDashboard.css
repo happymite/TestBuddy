@@ -1,0 +1,25 @@
+.exams-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+  margin-top: 1rem;
+}
+
+.exam-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.exam-card-head h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-main, #0f172a);
+}
+
+.exam-card button {
+  width: 100%;
+  margin-top: 8px;
+}
