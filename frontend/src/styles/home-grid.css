@@ -1,0 +1,187 @@
+/* SAGA CITY Courses & Examination Styles */
+.saga-courses-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+  gap: 1.5rem;
+}
+
+.saga-course-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1.65rem;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.saga-course-card:hover {
+  border-color: rgba(37, 99, 235, 0.4);
+  box-shadow: var(--shadow-md);
+}
+
+.saga-course-badge {
+  align-self: flex-start;
+  padding: 0.22rem 0.6rem;
+  border-radius: 9999px;
+  background: rgba(37, 99, 235, 0.08);
+  color: var(--primary);
+  font-size: 0.725rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+}
+
+.saga-course-title {
+  margin: 0 0 0.5rem;
+  font-size: 1.25rem;
+  font-weight: 750;
+  color: var(--text-main);
+}
+
+.saga-course-desc {
+  font-size: 0.885rem;
+  color: var(--text-muted);
+  line-height: 1.55;
+  margin: 0 0 1.15rem;
+  flex-grow: 1;
+}
+
+.saga-course-perks {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1.25rem;
+  font-size: 0.825rem;
+  color: var(--text-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.saga-course-btn {
+  display: block;
+  text-align: center;
+  padding: 0.6rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  border-radius: var(--radius-sm);
+  background: var(--bg-page);
+  color: var(--text-main);
+  border: 1px solid var(--border-color);
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+
+.saga-course-btn:hover {
+  background: var(--primary);
+  color: #ffffff;
+  border-color: var(--primary);
+}
+
+/* Exam Grid */
+.saga-exam-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+  gap: 1.35rem;
+  margin-bottom: 3rem;
+}
+
+.saga-exam-card {
+  background: var(--bg-page);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1.65rem;
+  transition: all 0.15s ease;
+}
+
+.saga-exam-card:hover {
+  background: var(--bg-surface);
+  border-color: rgba(37, 99, 235, 0.4);
+  box-shadow: var(--shadow-sm);
+}
+
+.saga-exam-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.85rem;
+}
+
+.saga-exam-icon-wrap {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  background: rgba(37, 99, 235, 0.08);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.saga-exam-badge {
+  font-size: 0.725rem;
+  font-weight: 700;
+  padding: 0.2rem 0.55rem;
+  border-radius: 9999px;
+  background: rgba(37, 99, 235, 0.08);
+  color: var(--primary);
+}
+
+.saga-exam-title {
+  margin: 0 0 0.45rem;
+  font-size: 1.15rem;
+  font-weight: 750;
+  color: var(--text-main);
+}
+
+.saga-exam-desc {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.saga-exam-cta-banner {
+  background: linear-gradient(135deg, var(--primary) 0%, #1e3a8a 100%);
+  color: #ffffff;
+  border-radius: var(--radius-lg);
+  padding: 2.25rem 2rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+  box-shadow: var(--shadow-md);
+}
+
+.saga-exam-cta-banner h3 {
+  margin: 0 0 0.3rem;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.saga-exam-cta-banner p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.925rem;
+}
+
+.saga-exam-cta-banner .saga-btn-primary {
+  background: #ffffff;
+  color: var(--primary);
+  border-color: #ffffff;
+}
+
+.saga-exam-cta-banner .saga-btn-primary:hover {
+  background: #f8fafc;
+  color: var(--primary-hover);
+}
+
+/* Mobile responsive grid */
+@media (max-width: 640px) {
+  .saga-courses-grid, .saga-exam-grid { grid-template-columns: 1fr; gap: 1rem; }
+  .saga-course-card, .saga-exam-card { padding: 1.25rem; }
+  .saga-exam-cta-banner { padding: 1.5rem 1.25rem; flex-direction: column; text-align: center; }
+  .saga-exam-cta-banner .saga-btn-primary { width: 100%; justify-content: center; }
+}

@@ -1,0 +1,158 @@
+@import "./home-hero.css";
+@import "./home-about.css";
+@import "./home-grid.css";
+@import "./home-resources.css";
+
+/* SAGA CITY Homepage Core & Layout Styles */
+.saga-home-root {
+  width: 100%;
+  overflow-x: hidden;
+  background: var(--bg-page);
+  color: var(--text-main);
+}
+
+.page-home {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.saga-container {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.saga-section {
+  padding: 3rem 0;
+  position: relative;
+}
+
+.saga-section-alt {
+  background: var(--bg-surface);
+  border-top: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.saga-section-head {
+  text-align: center;
+  max-width: 720px;
+  margin: 0 auto 2rem;
+}
+
+.saga-section-head h2 {
+  font-size: clamp(1.75rem, 3.5vw, 2.35rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin: 0 0 0.75rem;
+  color: var(--text-main);
+}
+
+.saga-section-head p {
+  font-size: 1rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Button System */
+.saga-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1.35rem;
+  font-size: 0.925rem;
+  font-weight: 700;
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  transition: all 0.15s ease;
+  cursor: pointer;
+  min-height: 42px;
+}
+
+.saga-btn-primary {
+  background: var(--primary);
+  color: #ffffff;
+  border: 1px solid var(--primary);
+  box-shadow: 0 2px 4px rgba(29, 78, 216, 0.2);
+}
+.saga-btn-primary:hover {
+  background: var(--primary-hover);
+  border-color: var(--primary-hover);
+  color: #ffffff;
+}
+
+.saga-btn-outline {
+  background: var(--bg-surface);
+  color: var(--text-main);
+  border: 1px solid var(--border-color);
+}
+.saga-btn-outline:hover {
+  background: var(--bg-surface-elevated);
+  border-color: var(--text-subtle);
+  color: var(--text-main);
+}
+
+.saga-btn-ghost {
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid transparent;
+}
+.saga-btn-ghost:hover {
+  background: var(--bg-surface);
+  border-color: var(--border-color);
+  color: var(--text-main);
+}
+
+/* Portal Gateways Grid */
+.saga-portal-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.saga-portal-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1.75rem;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.saga-portal-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: rgba(37, 99, 235, 0.4);
+}
+
+.saga-portal-icon-wrap {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-sm);
+  background: rgba(37, 99, 235, 0.08);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.saga-portal-badge {
+  font-size: 0.725rem;
+  font-weight: 700;
+  padding: 0.2rem 0.55rem;
+  border-radius: 9999px;
+  background: rgba(37, 99, 235, 0.08);
+  color: var(--primary);
+}
+
+/* Mobile Responsive Adjustments */
+@media (max-width: 640px) {
+  .saga-container { padding: 0 1rem; }
+  .saga-section { padding: 2rem 0; }
+  .saga-portal-grid { grid-template-columns: 1fr; gap: 1rem; }
+  .saga-portal-card { padding: 1.25rem; }
+  .saga-section-head { margin-bottom: 1.5rem; }
+}

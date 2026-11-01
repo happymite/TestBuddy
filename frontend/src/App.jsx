@@ -1,7 +1,5 @@
 import { lazy, Suspense } from "react";
 import { Routes, Route, Navigate } from "react-router";
-import { useAuth } from "./context/AuthContext.jsx";
-import { useAdminAuth } from "./context/AdminAuthContext.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import AdminProtectedRoute from "./components/AdminProtectedRoute.jsx";
 import Layout from "./components/Layout.jsx";
@@ -10,6 +8,10 @@ import ErrorBoundary from "./components/ErrorBoundary.jsx";
 import PageLoader from "./components/PageLoader.jsx";
 
 // Route-Level Lazy Loading (Code Splitting)
+const Home = lazy(() => import("./pages/Home.jsx"));
+const Examinations = lazy(() => import("./pages/Examinations.jsx"));
+const StudyMaterials = lazy(() => import("./pages/StudyMaterials.jsx"));
+const ResultsPortal = lazy(() => import("./pages/ResultsPortal.jsx"));
 const Login = lazy(() => import("./pages/Login.jsx"));
 const AdminLogin = lazy(() => import("./pages/AdminLogin.jsx"));
 const Register = lazy(() => import("./pages/Register.jsx"));
@@ -24,25 +26,12 @@ const PublicExam = lazy(() => import("./pages/publicExam.jsx"));
 const GuestTakeExam = lazy(() => import("./pages/guestTakeExam.jsx"));
 const ExamResults = lazy(() => import("./pages/ExamResults.jsx"));
 
-function RootRedirect() {
-  const { user, loading: userLoading } = useAuth();
-  const { admin, loading: adminLoading } = useAdminAuth();
-
-  if (userLoading || adminLoading) {
-    return <PageLoader text="Verifying session..." />;
-  }
-  if (admin) return <Navigate to="/admin" replace />;
-  if (user) return <Navigate to="/dashboard" replace />;
-  return <Navigate to="/login" replace />;
-}
-
 export default function App() {
   return (
     <ErrorBoundary>
       <Suspense fallback={<PageLoader />}>
         <Routes>
-          {/* Root and Public Auth Portals */}
-          <Route path="/" element={<RootRedirect />} />
+          {/* Public Authentication Routes */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/admin/login" element={<AdminLogin />} />
@@ -55,8 +44,12 @@ export default function App() {
             <Route path="/attempts/:attemptId/take" element={<TakeExam />} />
           </Route>
 
-          {/* Student Application Shell */}
+          {/* SAGA CITY Main & Student Application Shell */}
           <Route element={<Layout />}>
+            <Route path="/" element={<Home />} />
+            <Route path="/examinations" element={<Examinations />} />
+            <Route path="/study-materials" element={<StudyMaterials />} />
+            <Route path="/results" element={<ResultsPortal />} />
             <Route path="/exams/:examId" element={<PublicExam />} />
             <Route element={<ProtectedRoute role="student" />}>
               <Route path="/dashboard" element={<StudentDashboard />} />

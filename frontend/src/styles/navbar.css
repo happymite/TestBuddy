@@ -1,0 +1,111 @@
+/* SAGA CITY Navigation Styles */
+.saga-nav-header {
+  position: sticky; top: 0; z-index: 100;
+  background: var(--bg-surface, #ffffff);
+  border-bottom: 1px solid var(--border-color, #e2e8f0);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+.saga-nav-container {
+  max-width: 1320px; margin: 0 auto;
+  padding: 0.55rem 1.25rem;
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+}
+.saga-nav-brand-link { text-decoration: none; display: flex; align-items: center; }
+.saga-brand-text-wrap { display: flex; flex-direction: column; line-height: 1.15; margin-left: 0.65rem; }
+.saga-brand-title {
+  font-size: 1.2rem; font-weight: 850; letter-spacing: -0.01em;
+  color: #1D4ED8; font-family: var(--font-sans);
+}
+.saga-brand-subtitle {
+  font-size: 0.65rem; font-weight: 800; letter-spacing: 0.06em;
+  color: var(--text-main); text-transform: uppercase; margin-top: 2px;
+}
+.saga-brand-motto-sub {
+  font-size: 0.58rem; font-weight: 700; letter-spacing: 0.14em;
+  color: var(--text-subtle); text-transform: uppercase; margin-top: 4px;
+}
+.saga-nav-links { display: flex; align-items: center; gap: 0.2rem; list-style: none; margin: 0; padding: 0; }
+.saga-nav-item { position: relative; }
+.saga-nav-link {
+  display: inline-flex; align-items: center; gap: 0.3rem;
+  padding: 0.4rem 0.6rem; font-size: 0.85rem; font-weight: 600;
+  color: var(--text-muted, #475569); text-decoration: none;
+  border-radius: var(--radius-sm, 6px); transition: all 0.15s ease; white-space: nowrap;
+}
+.saga-nav-link:hover, .saga-nav-item:hover > .saga-nav-link {
+  color: var(--primary, #2563eb); background: rgba(37, 99, 235, 0.06);
+}
+.saga-chevron { font-size: 0.65rem; transition: transform 0.2s ease; opacity: 0.7; }
+.saga-nav-item:hover .saga-chevron { transform: rotate(180deg); }
+
+/* Dropdown Menu */
+.saga-dropdown {
+  position: absolute; top: 100%; left: 0; min-width: 210px;
+  padding: 0.35rem; margin-top: 0.25rem;
+  background: var(--bg-surface, #ffffff); border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: var(--radius-md, 8px); box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+  list-style: none; opacity: 0; visibility: hidden;
+  transform: translateY(4px); transition: all 0.15s ease; z-index: 110;
+}
+.saga-nav-item:hover .saga-dropdown, .saga-dropdown:hover {
+  opacity: 1; visibility: visible; transform: translateY(0);
+}
+.saga-dropdown-link {
+  display: block; padding: 0.45rem 0.7rem; font-size: 0.825rem; font-weight: 500;
+  color: var(--text-main, #0f172a); text-decoration: none; border-radius: var(--radius-sm, 6px);
+}
+.saga-dropdown-link:hover {
+  background: rgba(37, 99, 235, 0.08); color: var(--primary, #2563eb);
+}
+
+/* Right Nav Controls */
+.saga-nav-actions { display: flex; align-items: center; gap: 0.5rem; }
+.saga-contact-pill {
+  display: inline-flex; align-items: center; gap: 0.35rem;
+  padding: 0.35rem 0.75rem; border-radius: 9999px;
+  background: rgba(37, 99, 235, 0.08); color: var(--primary, #2563eb);
+  font-size: 0.8rem; font-weight: 700; text-decoration: none;
+  border: 1px solid rgba(37, 99, 235, 0.15); white-space: nowrap;
+}
+.saga-contact-pill:hover { background: var(--primary, #2563eb); color: #ffffff; }
+
+.saga-nav-login-btn {
+  display: inline-flex; align-items: center; padding: 0.42rem 0.9rem;
+  font-size: 0.825rem; font-weight: 700; border-radius: var(--radius-sm);
+  background: var(--primary); color: #ffffff !important;
+  text-decoration: none; white-space: nowrap;
+  box-shadow: 0 1px 3px rgba(29, 78, 216, 0.25); transition: all 0.15s ease;
+}
+.saga-nav-login-btn:hover {
+  background: var(--primary-hover); color: #ffffff !important; transform: translateY(-1px);
+}
+.saga-theme-btn, .saga-mobile-toggle {
+  background: transparent; border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: var(--radius-sm, 6px); padding: 0.35rem 0.5rem;
+  color: var(--text-main); cursor: pointer; line-height: 1; min-height: 34px;
+}
+.saga-mobile-toggle { display: none; }
+
+/* Mobile Responsive */
+@media (max-width: 1080px) {
+  .saga-nav-links, .saga-contact-pill { display: none; }
+  .saga-mobile-toggle { display: inline-flex; align-items: center; justify-content: center; }
+  .saga-mobile-drawer {
+    display: flex; flex-direction: column; padding: 1rem;
+    border-top: 1px solid var(--border-color); background: var(--bg-surface);
+    gap: 0.5rem; max-height: 80vh; overflow-y: auto;
+  }
+  .saga-mobile-drawer .saga-nav-link {
+    width: 100%; justify-content: space-between; padding: 0.6rem; font-size: 0.9rem;
+  }
+  .saga-mobile-dropdown {
+    padding-left: 0.75rem; display: flex; flex-direction: column; gap: 0.3rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .saga-nav-container { padding: 0.45rem 0.85rem; }
+  .saga-brand-subtitle { display: none; }
+  .saga-brand-title { font-size: 1.1rem; }
+  .saga-nav-login-btn { padding: 0.35rem 0.65rem; font-size: 0.775rem; }
+}

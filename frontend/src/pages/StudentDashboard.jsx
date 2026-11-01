@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { getPublishedExams, startAttempt } from "../api/exam.js";
+import { useAuth } from "../context/AuthContext.jsx";
+import { ClockIcon, TargetIcon, ArrowRightIcon, BookOpenIcon, TrophyIcon } from "../components/Icons.jsx";
 import "./StudentDashboard.css";
 
 function scheduleLabel(exam) {
@@ -40,29 +42,29 @@ function StudentExamCard({ exam }) {
     <article className="exam-card">
       <div className="exam-card-head">
         <h3>{exam.title}</h3>
-        <span className="badge">{exam.access_mode || "graded"}</span>
+        <span className="badge published">{exam.access_mode || "Active"}</span>
       </div>
 
-      {exam.description && (
-        <p className="exam-desc">{exam.description}</p>
-      )}
+      {exam.description && <p className="exam-desc">{exam.description}</p>}
 
       <ul className="exam-meta">
-        <li>{exam.duration_minutes} mins</li>
-        <li>{exam.total_marks} marks</li>
+        <li><ClockIcon size={14} /> {exam.duration_minutes} mins</li>
+        <li><TargetIcon size={14} /> {exam.total_marks} marks</li>
         <li>{scheduleLabel(exam)}</li>
       </ul>
 
       {error && <p className="error" role="alert">{error}</p>}
 
-      <button onClick={handleStart} disabled={starting}>
-        {starting ? "Starting..." : "Start Assessment"}
+      <button type="button" onClick={handleStart} disabled={starting} className="saga-btn saga-btn-primary">
+        <span>{starting ? "Launching Exam..." : "Start Assessment"}</span>
+        <ArrowRightIcon size={14} />
       </button>
     </article>
   );
 }
 
 export default function StudentDashboard() {
+  const { user } = useAuth();
   const [page, setPage] = useState(1);
   const [exams, setExams] = useState([]);
   const [pagination, setPagination] = useState(null);
@@ -83,20 +85,45 @@ export default function StudentDashboard() {
         setError(err.message);
         setLoading(false);
       });
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [page]);
 
   return (
     <div>
-      <div className="page-header">
-        <h1>Available Exams</h1>
+      {/* Student Portal Header Banner */}
+      <div className="saga-dashboard-banner">
+        <div>
+          <span className="saga-dashboard-badge">SAGA CITY STUDENT PORTAL</span>
+          <h1>Welcome, {user?.name || "Student"}</h1>
+          <p>Learn Today. Lead Tomorrow. — Official Academic &amp; Assessment Desk</p>
+        </div>
+        <div style={{ display: "flex", gap: "0.65rem", flexWrap: "wrap" }}>
+          <Link to="/study-materials" className="saga-btn saga-btn-outline" style={{ fontSize: "0.85rem", padding: "0.5rem 0.95rem" }}>
+            <BookOpenIcon size={15} />
+            <span>Study Materials</span>
+          </Link>
+          <Link to="/results" className="saga-btn saga-btn-outline" style={{ fontSize: "0.85rem", padding: "0.5rem 0.95rem" }}>
+            <TrophyIcon size={15} />
+            <span>My Results</span>
+          </Link>
+        </div>
       </div>
 
-      {loading && <p>Loading exams...</p>}
+      <div className="page-header" style={{ marginTop: "2rem" }}>
+        <h2>Available Examinations</h2>
+      </div>
+
+      {loading && <p>Loading your assigned examinations...</p>}
       {error && <p className="error" role="alert">{error}</p>}
 
       {!loading && !error && exams.length === 0 && (
-        <p className="hint">No exams are published right now. Please check back later.</p>
+        <div className="saga-intro-card" style={{ textAlign: "center", padding: "2.5rem 1.5rem" }}>
+          <p style={{ margin: 0, color: "var(--text-muted)" }}>
+            No exams are scheduled right now. Check back shortly or review your study materials.
+          </p>
+        </div>
       )}
 
       {!loading && !error && exams.length > 0 && (
@@ -108,7 +135,7 @@ export default function StudentDashboard() {
       )}
 
       {!loading && !error && pagination && pagination.totalPages > 1 && (
-        <div className="pager" style={{ marginTop: '1.5rem' }}>
+        <div className="pager" style={{ marginTop: "2rem", display: "flex", alignItems: "center", gap: "1rem" }}>
           <button disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>
             Previous
           </button>

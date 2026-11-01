@@ -1,28 +1,18 @@
-import { Outlet } from "react-router";
+import { Outlet, useLocation } from "react-router";
 import Navbar from "./Navbar.jsx";
+import Footer from "./Footer.jsx";
 
 export default function Layout() {
+  const location = useLocation();
+  const isHome = location.pathname === "/";
+
   return (
     <div className="app-shell">
       <Navbar />
-      <main className="page">
+      <main className={isHome ? "page-home" : "page"}>
         <Outlet />
       </main>
-      <footer className="site-footer">
-        <div className="footer-inner">
-          <div className="footer-brand">
-            <span className="footer-logo">
-              <span className="footer-dot"></span> TEST BUDDY
-            </span>
-            <span className="footer-tagline">
-              Simple, focused exam preparation
-            </span>
-          </div>
-          <div className="footer-meta">
-            <span>© 2026 TestBuddy. All rights reserved.</span>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

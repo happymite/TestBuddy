@@ -1,5 +1,6 @@
 import { Link, Outlet, useNavigate } from "react-router";
 import { useAdminAuth } from "../context/AdminAuthContext.jsx";
+import SagaCityLogo from "./SagaCityLogo.jsx";
 
 export default function AdminLayout() {
   const { admin, logoutAdmin } = useAdminAuth();
@@ -14,11 +15,11 @@ export default function AdminLayout() {
     <>
       <header className="navbar" style={{ borderBottom: "1px solid var(--border-color, #e5e7eb)" }}>
         <div className="navbar-brand-wrap">
-          <Link to="/admin" className="brand" style={{ fontWeight: 700 }}>
-            TestBuddy Admin
+          <Link to="/admin" style={{ textDecoration: "none" }}>
+            <SagaCityLogo size={30} />
           </Link>
           <span className="badge admin" style={{ textTransform: "uppercase", fontSize: "0.7rem", letterSpacing: "0.05em" }}>
-            Admin
+            Admin Console
           </span>
         </div>
 
@@ -49,4 +50,3 @@ export default function AdminLayout() {
     </>
   );
 }
-
