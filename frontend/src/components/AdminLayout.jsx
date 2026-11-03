@@ -12,41 +12,42 @@ export default function AdminLayout() {
   }
 
   return (
-    <>
-      <header className="navbar" style={{ borderBottom: "1px solid var(--border-color, #e5e7eb)" }}>
-        <div className="navbar-brand-wrap">
-          <Link to="/admin" style={{ textDecoration: "none" }}>
-            <SagaCityLogo size={30} />
-          </Link>
-          <span className="badge admin" style={{ textTransform: "uppercase", fontSize: "0.7rem", letterSpacing: "0.05em" }}>
-            Admin Console
-          </span>
-        </div>
+    <div className="admin-app-shell">
+      <header className="admin-nav-header">
+        <div className="admin-nav-container">
+          <div className="admin-nav-brand">
+            <Link to="/admin" className="admin-brand-link">
+              <SagaCityLogo size={28} />
+            </Link>
+            <span className="badge admin admin-badge-tag">Admin Console</span>
+          </div>
 
-        <nav style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
-          <Link to="/admin" className="button-link secondary" style={{ padding: "0.35rem 0.75rem", fontSize: "0.85rem" }}>
-            Dashboard
-          </Link>
-          <Link to="/admin/exams/new" className="button-link" style={{ padding: "0.35rem 0.75rem", fontSize: "0.85rem" }}>
-            + Create Exam
-          </Link>
-        </nav>
+          <nav className="admin-nav-links">
+            <Link to="/admin" className="button-link secondary admin-nav-btn">
+              Dashboard
+            </Link>
+            <Link to="/admin/exams/new" className="button-link admin-nav-btn">
+              + New Test
+            </Link>
+          </nav>
 
-        <div className="navbar-right">
-          {admin && (
-            <span>
-              {admin.name} ({admin.email})
-            </span>
-          )}
-          <button onClick={handleLogout} className="secondary" style={{ fontSize: "0.85rem" }}>
-            Sign Out
-          </button>
+          <div className="admin-nav-right">
+            {admin && (
+              <span className="admin-user-info" title={admin.email}>
+                <span className="admin-user-name">{admin.name}</span>
+                <span className="admin-user-email">({admin.email})</span>
+              </span>
+            )}
+            <button onClick={handleLogout} className="secondary admin-logout-btn">
+              Sign Out
+            </button>
+          </div>
         </div>
       </header>
 
-      <main className="page">
+      <main className="page admin-main-page">
         <Outlet />
       </main>
-    </>
+    </div>
   );
 }

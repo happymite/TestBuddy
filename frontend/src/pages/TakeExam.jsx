@@ -25,6 +25,7 @@ export default function TakeExam() {
 
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
+  const [retryTick, setRetryTick] = useState(0);
   const submittingRef = useRef(false);
 
   useEffect(() => {
@@ -86,12 +87,13 @@ export default function TakeExam() {
       setSubmitError(err.message);
       setSubmitting(false);
       submittingRef.current = false;
+      setTimeout(() => setRetryTick((t) => t + 1), 3000); // try again in 3 seconds
     }
   }, [attemptId, navigate]);
 
   useEffect(() => {
     if (secondsLeft === 0) finish();
-  }, [secondsLeft, finish]);
+  }, [secondsLeft, finish, retryTick]);
 
   async function persist(questionId, option) {
     setSaveStatus((s) => ({ ...s, [questionId]: "saving" }));
@@ -115,6 +117,12 @@ export default function TakeExam() {
   }
 
   function handleSubmitClick() {
+    const failed = questions.filter((x) => saveStatus[x.id] === "failed").length;
+    if (failed > 0) {
+      window.alert(`${failed} answer(s) did not save. Press Retry on those questions first.`);
+      return;
+    }
+
     const unanswered = questions.filter((x) => !answers[x.id]).length;
     let msg = "Submit your exam? You cannot change answers afterwards.";
     if (unanswered > 0) msg = `${unanswered} question(s) are unanswered.\n\n` + msg;

@@ -1,82 +1,134 @@
+.student-dashboard-wrap { max-width: 1240px; margin: 0 auto; }
+
 .saga-dashboard-banner {
   background: var(--bg-surface);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
   padding: 1.25rem 1.5rem;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: center;
-  gap: 1rem;
-  box-shadow: var(--shadow-sm);
+  display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center;
+  gap: 1rem; box-shadow: var(--shadow-sm);
 }
 
 .saga-dashboard-badge {
-  font-size: 0.725rem;
-  font-weight: 800;
-  letter-spacing: 0.1em;
-  color: var(--primary);
-  text-transform: uppercase;
+  font-size: 0.7rem; font-weight: 800; letter-spacing: 0.1em;
+  color: var(--primary); text-transform: uppercase;
 }
 
 .saga-dashboard-banner h1 {
-  margin: 0.2rem 0 0.15rem;
-  font-size: 1.5rem;
-  font-weight: 800;
-  color: var(--text-main);
+  margin: 0.2rem 0 0.15rem; font-size: 1.45rem; font-weight: 800; color: var(--text-main);
+}
+.saga-dashboard-banner p { margin: 0; font-size: 0.875rem; color: var(--text-muted); }
+
+.dashboard-quick-actions { display: flex; gap: 0.65rem; flex-wrap: wrap; }
+.quick-link-btn { font-size: 0.85rem; padding: 0.45rem 0.9rem; min-height: 38px; }
+
+/* Filter Section & Subject Chips */
+.dashboard-filter-section {
+  margin-top: 2rem; margin-bottom: 1.25rem;
+  display: flex; flex-direction: column; gap: 0.85rem;
 }
 
-.saga-dashboard-banner p {
-  margin: 0;
-  font-size: 0.875rem;
-  color: var(--text-muted);
+.filter-header-row {
+  display: flex; justify-content: space-between; align-items: flex-end;
+  flex-wrap: wrap; gap: 0.85rem;
+}
+.filter-header-row h2 { margin: 0 0 0.2rem; font-size: 1.35rem; font-weight: 800; color: var(--text-main); }
+
+/* Mode Segmented Controls */
+.mode-toggle-group {
+  display: inline-flex; background: var(--bg-surface);
+  border: 1px solid var(--border-color); border-radius: var(--radius-sm);
+  padding: 3px; gap: 3px;
+}
+.mode-btn {
+  padding: 0.35rem 0.75rem; border: none; background: transparent;
+  color: var(--text-muted); font-size: 0.8rem; font-weight: 600;
+  border-radius: 4px; cursor: pointer; transition: all 0.15s ease;
+}
+.mode-btn.active {
+  background: var(--primary); color: #ffffff;
 }
 
+/* Subject Category Chips Bar */
+.subject-chips-bar {
+  display: flex; gap: 0.45rem; overflow-x: auto; padding-bottom: 4px;
+  scrollbar-width: none; -webkit-overflow-scrolling: touch;
+}
+.subject-chips-bar::-webkit-scrollbar { display: none; }
+
+.subject-chip {
+  padding: 0.35rem 0.85rem; border-radius: 9999px;
+  border: 1px solid var(--border-color); background: var(--bg-surface);
+  color: var(--text-muted); font-size: 0.8rem; font-weight: 650;
+  white-space: nowrap; cursor: pointer; transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+.subject-chip:hover {
+  border-color: var(--primary); color: var(--text-main);
+}
+.subject-chip.active {
+  background: rgba(37, 99, 235, 0.1); border-color: var(--primary);
+  color: var(--primary); font-weight: 750;
+}
+
+/* Exams Grid & Cards */
 .exams-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1.15rem;
-  margin-top: 1rem;
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 1.15rem; margin-top: 1rem;
+}
+
+.exam-card {
+  background: var(--bg-surface); border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg); padding: 1.35rem;
+  box-shadow: var(--shadow-sm); display: flex; flex-direction: column;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.exam-card:hover {
+  border-color: rgba(37, 99, 235, 0.35); box-shadow: var(--shadow-md);
 }
 
 .exam-card-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  width: 100%;
-  gap: 0.75rem;
+  display: flex; justify-content: space-between; align-items: center;
+  width: 100%; margin-bottom: 0.65rem;
+}
+.exam-subject-pill {
+  font-size: 0.725rem; font-weight: 750; padding: 0.2rem 0.6rem;
+  border-radius: 9999px; background: rgba(37, 99, 235, 0.08);
+  color: var(--primary);
+}
+.badge.practice {
+  background: rgba(16, 185, 129, 0.1); color: #059669;
+  border-color: rgba(16, 185, 129, 0.2); font-size: 0.7rem;
 }
 
-.exam-card-head h3 {
-  margin: 0;
-  font-size: 1.2rem;
-  font-weight: 750;
-  color: var(--text-main);
+.exam-card-title {
+  margin: 0 0 0.4rem; font-size: 1.15rem; font-weight: 750;
+  color: var(--text-main); line-height: 1.35;
+}
+.exam-desc {
+  font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;
+  margin: 0 0 0.85rem; flex-grow: 1;
 }
 
 .exam-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem 1rem;
-  list-style: none;
-  padding: 0;
-  margin: 0.75rem 0 1.25rem;
-  font-size: 0.85rem;
-  color: var(--text-muted);
+  display: flex; flex-wrap: wrap; gap: 0.65rem 0.85rem;
+  list-style: none; padding: 0; margin: 0 0 1rem;
+  font-size: 0.8rem; color: var(--text-muted);
 }
+.exam-meta li { display: inline-flex; align-items: center; gap: 0.3rem; }
 
-.exam-meta li {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-}
+.exam-start-btn { width: 100%; justify-content: center; min-height: 42px; }
+.empty-dashboard-card { text-align: center; padding: 2.5rem 1rem; }
+.empty-dashboard-card p { margin: 0; color: var(--text-muted); }
 
-@media (max-width: 600px) {
-  .saga-dashboard-banner {
-    padding: 1rem;
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  .saga-dashboard-banner h1 { font-size: 1.3rem; }
+/* Mobile Optimizations */
+@media (max-width: 640px) {
+  .saga-dashboard-banner { padding: 1rem; flex-direction: column; align-items: flex-start; }
+  .saga-dashboard-banner h1 { font-size: 1.25rem; }
+  .dashboard-quick-actions { width: 100%; }
+  .dashboard-quick-actions .quick-link-btn { flex: 1; justify-content: center; }
+  .filter-header-row { flex-direction: column; align-items: flex-start; }
+  .mode-toggle-group { width: 100%; }
+  .mode-toggle-group .mode-btn { flex: 1; text-align: center; }
   .exams-grid { grid-template-columns: 1fr; gap: 0.85rem; }
 }

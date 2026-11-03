@@ -55,16 +55,14 @@ export default function AdminUsersTable({ users, onRoleChange }) {
             ) : (
               filtered.map((u) => (
                 <tr key={u.id}>
-                  <td>#{u.id}</td>
-                  <td>
-                    <strong>{u.name}</strong>
+                  <td data-label="ID">#{u.id}</td>
+                  <td data-label="Name"><strong>{u.name}</strong></td>
+                  <td data-label="Email">{u.email}</td>
+                  <td data-label="Role">
+                    <span className={`badge ${u.role === "admin" ? "role-admin" : "role-student"}`}>{u.role}</span>
                   </td>
-                  <td>{u.email}</td>
-                  <td>
-                    <span className={`badge ${u.role === 'admin' ? 'role-admin' : 'role-student'}`}>{u.role}</span>
-                  </td>
-                  <td>{new Date(u.created_at).toLocaleDateString()}</td>
-                  <td>
+                  <td data-label="Joined">{new Date(u.created_at).toLocaleDateString()}</td>
+                  <td data-label="Action">
                     <select
                       className="admin-role-select"
                       value={u.role}

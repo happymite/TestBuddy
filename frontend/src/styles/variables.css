@@ -1,4 +1,5 @@
 :root {
+  color-scheme: light;
   --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --bg-page: #f8fafc;
   --bg-surface: #ffffff;
@@ -17,6 +18,11 @@
   --success-bg: #ecfdf5;
   --success-text: #047857;
   --success-border: #a7f3d0;
+  --input-bg: #ffffff;
+  --input-border: #cbd5e1;
+  --placeholder-color: #64748b;
+  --option-hover-bg: #f8fafc;
+  --option-selected-bg: #eff6ff;
   --shadow-sm: 0 1px 2px 0 rgba(15, 23, 42, 0.05);
   --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.07), 0 2px 4px -2px rgba(15, 23, 42, 0.05);
   --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.04);
@@ -26,6 +32,7 @@
 }
 
 [data-theme="dark"] {
+  color-scheme: dark;
   --bg-page: #0a0f1d;
   --bg-surface: #111827;
   --bg-surface-elevated: #1f293d;
@@ -38,6 +45,16 @@
   --primary-hover: #60a5fa;
   --accent: #f59e0b;
   --accent-light: rgba(245, 158, 11, 0.15);
+  --danger: #ef4444;
+  --danger-hover: #dc2626;
+  --success-bg: rgba(16, 185, 129, 0.15);
+  --success-text: #34d399;
+  --success-border: rgba(16, 185, 129, 0.3);
+  --input-bg: #1e293b;
+  --input-border: #334155;
+  --placeholder-color: #94a3b8;
+  --option-hover-bg: #1e293d;
+  --option-selected-bg: rgba(59, 130, 246, 0.18);
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
   --shadow-lg: 0 10px 20px -3px rgba(0, 0, 0, 0.65);
@@ -50,6 +67,34 @@
 ::selection {
   background: rgba(37, 99, 235, 0.25);
   color: inherit;
+}
+
+/* Base form controls theming & placeholder visibility */
+input, textarea, select {
+  color: var(--text-main);
+  background-color: var(--input-bg);
+  border-color: var(--input-border);
+  color-scheme: inherit;
+}
+
+::placeholder {
+  color: var(--placeholder-color) !important;
+  opacity: 1 !important;
+}
+
+::-webkit-input-placeholder {
+  color: var(--placeholder-color) !important;
+  opacity: 1 !important;
+}
+
+::-moz-placeholder {
+  color: var(--placeholder-color) !important;
+  opacity: 1 !important;
+}
+
+:-ms-input-placeholder {
+  color: var(--placeholder-color) !important;
+  opacity: 1 !important;
 }
 
 /* Custom Scrollbar Theming */

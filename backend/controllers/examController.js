@@ -7,6 +7,7 @@ export async function createExam(req, res) {
     const {
       title, description, duration_minutes, starts_at, ends_at,
       access_mode = "graded", subject_id = null,
+      max_attempts = 1,
     } = req.body ?? {};
 
     const subjectIdVal = subject_id === null || subject_id === undefined ? null : Number(subject_id);
@@ -25,13 +26,19 @@ export async function createExam(req, res) {
     if (starts_at && ends_at && new Date(ends_at) <= new Date(starts_at)) {
       return res.status(400).json({ success: false, message: "End time must be after start time." });
     }
+    // max_attempts: integer 1–5. DB CHECK constraint is the safety net; this gives a friendly error.
+    if (!Number.isInteger(max_attempts) || max_attempts < 1 || max_attempts > 5) {
+      return res.status(400).json({ success: false, message: "Attempts allowed must be a whole number from 1 to 5." });
+    }
 
     const result = await pool.query(
       `INSERT INTO public.exams
-         (title, description, duration_minutes, total_marks, starts_at, ends_at, created_by, access_mode, subject_id)
-       VALUES ($1, $2, $3, 0, $4, $5, $6, $7, $8)
-       RETURNING id, title, description, duration_minutes, total_marks, is_published, starts_at, ends_at, created_by, created_at, access_mode, subject_id`,
-      [title.trim(), description?.trim() || null, duration_minutes, starts_at || null, ends_at || null, req.user.id, access_mode, subjectIdVal],
+         (title, description, duration_minutes, total_marks, starts_at, ends_at, created_by, access_mode, subject_id, max_attempts)
+       VALUES ($1, $2, $3, 0, $4, $5, $6, $7, $8, $9)
+       RETURNING id, title, description, duration_minutes, total_marks, is_published,
+                 starts_at, ends_at, created_by, created_at, access_mode, subject_id, max_attempts`,
+      [title.trim(), description?.trim() || null, duration_minutes,
+       starts_at || null, ends_at || null, req.user.id, access_mode, subjectIdVal, max_attempts],
     );
 
     return res.status(201).json({ success: true, message: "Exam created successfully.", exam: result.rows[0] });

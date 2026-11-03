@@ -53,26 +53,68 @@ export async function togglePublishExam(req, res) {
     return res.status(400).json({ success: false, message: "Invalid exam ID." });
   }
 
+  let client;
   try {
-    const check = await pool.query("SELECT id, is_published FROM public.exams WHERE id = $1", [examId]);
+    client = await pool.connect();
+    await client.query("BEGIN");
+
+    // FOR UPDATE locks this exam row so two admin clicks can't collide.
+    const check = await client.query(
+      "SELECT id, is_published FROM public.exams WHERE id = $1 FOR UPDATE",
+      [examId],
+    );
     if (check.rows.length === 0) {
+      await client.query("ROLLBACK");
       return res.status(404).json({ success: false, message: "Exam not found." });
     }
 
-    const newStatus = !check.rows[0].is_published;
-    const result = await pool.query(
-      "UPDATE public.exams SET is_published = $1 WHERE id = $2 RETURNING id, is_published",
-      [newStatus, examId]
-    );
+    const publishing = !check.rows[0].is_published;
+    let result;
 
+    if (publishing) {
+      const q = await client.query(
+        `SELECT COUNT(*)::int AS count, COALESCE(SUM(marks), 0)::int AS total
+         FROM public.questions WHERE exam_id = $1`,
+        [examId],
+      );
+      if (q.rows[0].count === 0) {
+        await client.query("ROLLBACK");
+        return res.status(400).json({ success: false, message: "Add at least one question before publishing." });
+      }
+      result = await client.query(
+        `UPDATE public.exams SET is_published = true, total_marks = $1
+         WHERE id = $2 RETURNING id, is_published, total_marks`,
+        [q.rows[0].total, examId],
+      );
+    } else {
+      const active = await client.query(
+        `SELECT 1 FROM public.exam_attempts
+         WHERE exam_id = $1 AND status = 'in_progress' AND expires_at > NOW() LIMIT 1`,
+        [examId],
+      );
+      if (active.rows.length > 0) {
+        await client.query("ROLLBACK");
+        return res.status(409).json({ success: false, message: "Students are taking this exam right now. Try again after they finish." });
+      }
+      result = await client.query(
+        `UPDATE public.exams SET is_published = false
+         WHERE id = $1 RETURNING id, is_published, total_marks`,
+        [examId],
+      );
+    }
+
+    await client.query("COMMIT");
     return res.status(200).json({
       success: true,
-      message: `Exam ${newStatus ? "published" : "unpublished"} successfully.`,
+      message: `Exam ${publishing ? "published" : "unpublished"} successfully.`,
       exam: result.rows[0],
     });
   } catch (error) {
+    if (client) await client.query("ROLLBACK").catch(() => {});
     console.error("Toggle publish error:", error.message);
     return res.status(500).json({ success: false, message: "Unable to toggle exam status." });
+  } finally {
+    client?.release();
   }
 }
 

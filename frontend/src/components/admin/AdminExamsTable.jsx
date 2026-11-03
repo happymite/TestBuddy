@@ -11,11 +11,7 @@ export default function AdminExamsTable({ exams, onTogglePublish, onDeleteExam }
       e.title.toLowerCase().includes(search.toLowerCase()) ||
       (e.creator_name && e.creator_name.toLowerCase().includes(search.toLowerCase()));
     const matchStatus =
-      statusFilter === "all"
-        ? true
-        : statusFilter === "published"
-        ? e.is_published
-        : !e.is_published;
+      statusFilter === "all" ? true : statusFilter === "published" ? e.is_published : !e.is_published;
     return matchSearch && matchStatus;
   });
 
@@ -45,7 +41,7 @@ export default function AdminExamsTable({ exams, onTogglePublish, onDeleteExam }
           <option value="published">Published</option>
           <option value="draft">Drafts</option>
         </select>
-        <Link to="/admin/exams/new" className="button-link">
+        <Link to="/admin/exams/new" className="button-link" style={{ whiteSpace: "nowrap" }}>
           + Create Test
         </Link>
       </div>
@@ -56,7 +52,6 @@ export default function AdminExamsTable({ exams, onTogglePublish, onDeleteExam }
             <tr>
               <th>ID</th>
               <th>Test Title</th>
-              <th>Creator</th>
               <th>Subject</th>
               <th>Duration</th>
               <th>Questions</th>
@@ -68,36 +63,32 @@ export default function AdminExamsTable({ exams, onTogglePublish, onDeleteExam }
           <tbody>
             {filtered.length === 0 ? (
               <tr>
-                <td colSpan="9" className="admin-empty-cell">
+                <td colSpan="8" className="admin-empty-cell">
                   No exams found matching your filter.
                 </td>
               </tr>
             ) : (
               filtered.map((e) => (
                 <tr key={e.id}>
-                  <td>#{e.id}</td>
-                  <td>
+                  <td data-label="ID">#{e.id}</td>
+                  <td data-label="Title">
                     <strong>{e.title}</strong>
                     <div className="admin-text-sub">
                       Mode: <span style={{ textTransform: "capitalize" }}>{e.access_mode}</span>
                     </div>
                   </td>
-                  <td>
-                    {e.creator_name || "Admin"}
-                    <div className="admin-text-sub">{e.creator_email}</div>
+                  <td data-label="Subject">{e.subject_name || "General"}</td>
+                  <td data-label="Duration">{e.duration_minutes} min</td>
+                  <td data-label="Questions">{e.question_count} Qs</td>
+                  <td data-label="Attempts">
+                    <span className="badge">{e.attempt_count}</span>
                   </td>
-                  <td>{e.subject_name || "Uncategorised"}</td>
-                  <td>{e.duration_minutes} min</td>
-                  <td>{e.question_count} Qs</td>
-                  <td>
-                    <span className="badge">{e.attempt_count} attempts</span>
-                  </td>
-                  <td>
+                  <td data-label="Status">
                     <span className={`badge ${e.is_published ? "published" : ""}`}>
                       {e.is_published ? "Published" : "Draft"}
                     </span>
                   </td>
-                  <td>
+                  <td data-label="Actions">
                     <div className="admin-actions-cell">
                       <button
                         onClick={() => onTogglePublish(e.id)}
@@ -105,22 +96,15 @@ export default function AdminExamsTable({ exams, onTogglePublish, onDeleteExam }
                       >
                         {e.is_published ? "Unpublish" : "Publish"}
                       </button>
-
                       <Link to={`/admin/exams/${e.id}`} className="button-link secondary admin-btn-sm">
                         Questions
                       </Link>
-
                       <Link to={`/admin/exams/${e.id}/results`} className="button-link secondary admin-btn-sm">
                         Results
                       </Link>
-
-                      <button
-                        onClick={() => handleCopy(e.id)}
-                        className="secondary admin-btn-sm"
-                      >
+                      <button onClick={() => handleCopy(e.id)} className="secondary admin-btn-sm">
                         {copiedId === e.id ? "Copied" : "Link"}
                       </button>
-
                       <button
                         onClick={() => onDeleteExam(e.id, e.title)}
                         className="button-danger admin-btn-sm"

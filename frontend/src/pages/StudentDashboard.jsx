@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Link, useNavigate } from "react-router";
 import { getPublishedExams, startAttempt } from "../api/exam.js";
 import { useAuth } from "../context/AuthContext.jsx";
@@ -22,11 +22,7 @@ function StudentExamCard({ exam }) {
   const [error, setError] = useState("");
 
   async function handleStart() {
-    const ok = window.confirm(
-      "Starting begins the timer immediately and cannot be paused. Continue?",
-    );
-    if (!ok) return;
-
+    if (!window.confirm("Starting begins the timer immediately. Continue?")) return;
     setError("");
     setStarting(true);
     try {
@@ -41,22 +37,21 @@ function StudentExamCard({ exam }) {
   return (
     <article className="exam-card">
       <div className="exam-card-head">
-        <h3>{exam.title}</h3>
-        <span className="badge published">{exam.access_mode || "Active"}</span>
+        <span className="exam-subject-pill">{exam.subject_name || "General"}</span>
+        <span className={`badge ${exam.access_mode === "practice" ? "practice" : "published"}`}>
+          {exam.access_mode === "practice" ? "Practice" : "Graded"}
+        </span>
       </div>
-
+      <h3 className="exam-card-title">{exam.title}</h3>
       {exam.description && <p className="exam-desc">{exam.description}</p>}
-
       <ul className="exam-meta">
         <li><ClockIcon size={14} /> {exam.duration_minutes} mins</li>
         <li><TargetIcon size={14} /> {exam.total_marks} marks</li>
         <li>{scheduleLabel(exam)}</li>
       </ul>
-
       {error && <p className="error" role="alert">{error}</p>}
-
-      <button type="button" onClick={handleStart} disabled={starting} className="saga-btn saga-btn-primary">
-        <span>{starting ? "Launching Exam..." : "Start Assessment"}</span>
+      <button type="button" onClick={handleStart} disabled={starting} className="saga-btn saga-btn-primary exam-start-btn">
+        <span>{starting ? "Launching..." : "Start Assessment"}</span>
         <ArrowRightIcon size={14} />
       </button>
     </article>
@@ -65,84 +60,110 @@ function StudentExamCard({ exam }) {
 
 export default function StudentDashboard() {
   const { user } = useAuth();
-  const [page, setPage] = useState(1);
   const [exams, setExams] = useState([]);
-  const [pagination, setPagination] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [selectedSubject, setSelectedSubject] = useState("all");
+  const [selectedMode, setSelectedMode] = useState("all");
 
   useEffect(() => {
     let cancelled = false;
-    getPublishedExams(page)
-      .then((data) => {
-        if (cancelled) return;
-        setExams(data.exams || []);
-        setPagination(data.pagination);
-        setLoading(false);
-      })
-      .catch((err) => {
-        if (cancelled) return;
-        setError(err.message);
-        setLoading(false);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [page]);
+    getPublishedExams(1, 50)
+      .then((data) => { if (!cancelled) { setExams(data.exams || []); setLoading(false); } })
+      .catch((err) => { if (!cancelled) { setError(err.message); setLoading(false); } });
+    return () => { cancelled = true; };
+  }, []);
+
+  const subjects = useMemo(() => {
+    const map = {};
+    for (const e of exams) {
+      const name = e.subject_name || "General";
+      map[name] = (map[name] || 0) + 1;
+    }
+    return Object.entries(map).map(([name, count]) => ({ name, count }));
+  }, [exams]);
+
+  const filteredExams = useMemo(() => {
+    return exams.filter((e) => {
+      const subj = e.subject_name || "General";
+      const matchSubj = selectedSubject === "all" || subj === selectedSubject;
+      const matchMode = selectedMode === "all" || e.access_mode === selectedMode;
+      return matchSubj && matchMode;
+    });
+  }, [exams, selectedSubject, selectedMode]);
 
   return (
-    <div>
-      {/* Student Portal Header Banner */}
+    <div className="student-dashboard-wrap">
+      {/* Header Banner */}
       <div className="saga-dashboard-banner">
         <div>
           <span className="saga-dashboard-badge">SAGA CITY STUDENT PORTAL</span>
           <h1>Welcome, {user?.name || "Student"}</h1>
           <p>Learn Today. Lead Tomorrow. — Official Academic &amp; Assessment Desk</p>
         </div>
-        <div style={{ display: "flex", gap: "0.65rem", flexWrap: "wrap" }}>
-          <Link to="/study-materials" className="saga-btn saga-btn-outline" style={{ fontSize: "0.85rem", padding: "0.5rem 0.95rem" }}>
-            <BookOpenIcon size={15} />
-            <span>Study Materials</span>
+        <div className="dashboard-quick-actions">
+          <Link to="/study-materials" className="saga-btn saga-btn-outline quick-link-btn">
+            <BookOpenIcon size={15} /> <span>Study Materials</span>
           </Link>
-          <Link to="/results" className="saga-btn saga-btn-outline" style={{ fontSize: "0.85rem", padding: "0.5rem 0.95rem" }}>
-            <TrophyIcon size={15} />
-            <span>My Results</span>
+          <Link to="/results" className="saga-btn saga-btn-outline quick-link-btn">
+            <TrophyIcon size={15} /> <span>My Results</span>
           </Link>
         </div>
       </div>
 
-      <div className="page-header" style={{ marginTop: "2rem" }}>
-        <h2>Available Examinations</h2>
+      {/* Subject & Category Toolbar */}
+      <div className="dashboard-filter-section">
+        <div className="filter-header-row">
+          <div>
+            <h2>Assigned Tests &amp; Exams</h2>
+            <p className="hint">Organized by academic categories and formats.</p>
+          </div>
+          <div className="mode-toggle-group">
+            <button type="button" className={`mode-btn ${selectedMode === "all" ? "active" : ""}`} onClick={() => setSelectedMode("all")}>
+              All ({exams.length})
+            </button>
+            <button type="button" className={`mode-btn ${selectedMode === "graded" ? "active" : ""}`} onClick={() => setSelectedMode("graded")}>
+              Graded
+            </button>
+            <button type="button" className={`mode-btn ${selectedMode === "practice" ? "active" : ""}`} onClick={() => setSelectedMode("practice")}>
+              Practice
+            </button>
+          </div>
+        </div>
+
+        {/* Subject Chips */}
+        {subjects.length > 0 && (
+          <div className="subject-chips-bar">
+            <button type="button" className={`subject-chip ${selectedSubject === "all" ? "active" : ""}`} onClick={() => setSelectedSubject("all")}>
+              All Subjects ({exams.length})
+            </button>
+            {subjects.map((s) => (
+              <button key={s.name} type="button" className={`subject-chip ${selectedSubject === s.name ? "active" : ""}`} onClick={() => setSelectedSubject(s.name)}>
+                {s.name} ({s.count})
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {loading && <p>Loading your assigned examinations...</p>}
       {error && <p className="error" role="alert">{error}</p>}
 
-      {!loading && !error && exams.length === 0 && (
-        <div className="saga-intro-card" style={{ textAlign: "center", padding: "2.5rem 1.5rem" }}>
-          <p style={{ margin: 0, color: "var(--text-muted)" }}>
-            No exams are scheduled right now. Check back shortly or review your study materials.
+      {!loading && !error && filteredExams.length === 0 && (
+        <div className="saga-intro-card empty-dashboard-card">
+          <p>
+            {selectedSubject !== "all" || selectedMode !== "all"
+              ? "No exams found in this category. Select another subject."
+              : "No exams are scheduled right now. Check back shortly."}
           </p>
         </div>
       )}
 
-      {!loading && !error && exams.length > 0 && (
+      {!loading && !error && filteredExams.length > 0 && (
         <div className="exams-grid">
-          {exams.map((exam) => (
+          {filteredExams.map((exam) => (
             <StudentExamCard key={exam.id} exam={exam} />
           ))}
-        </div>
-      )}
-
-      {!loading && !error && pagination && pagination.totalPages > 1 && (
-        <div className="pager" style={{ marginTop: "2rem", display: "flex", alignItems: "center", gap: "1rem" }}>
-          <button disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>
-            Previous
-          </button>
-          <span>Page {pagination.page} of {pagination.totalPages}</span>
-          <button disabled={page >= pagination.totalPages} onClick={() => setPage((p) => p + 1)}>
-            Next
-          </button>
         </div>
       )}
     </div>

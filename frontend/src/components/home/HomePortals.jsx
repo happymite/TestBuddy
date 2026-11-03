@@ -7,52 +7,52 @@ const PORTALS = [
     title: "Online Examination Portal",
     badge: "Live Tests",
     icon: ClockIcon,
-    desc: "Participate in real-time scheduled examinations, chapter-wise evaluations, and full mock test series with server-clock precision.",
+    desc: "Timed scheduled exams, chapter-wise tests, and mock series with server accuracy.",
     to: "/examinations",
-    btnText: "Open Examination Portal",
+    btnText: "Open Exam Portal",
   },
   {
     id: "materials",
-    title: "Study Materials & Question Bank",
-    badge: "Free Resources",
+    title: "Study Materials & Notes",
+    badge: "Free Access",
     icon: BookOpenIcon,
-    desc: "Access chapter revision notes, downloadable PDF guides, formula handbooks, and previous year board & entrance questions.",
+    desc: "Chapter revision notes, formula handbooks, and past year question papers.",
     to: "/study-materials",
-    btnText: "Browse Study Materials",
+    btnText: "Browse Materials",
   },
   {
     id: "results",
-    title: "Results & Merit Standings",
+    title: "Results & Scorecards",
     badge: "Analytics",
     icon: TrophyIcon,
-    desc: "Inspect automated evaluation scores, question-by-question response breakdowns, and cohort merit rankings.",
+    desc: "Instant score evaluations, question breakdowns, and performance analytics.",
     to: "/results",
-    btnText: "View Performance & Results",
+    btnText: "View Results",
   },
 ];
 
 export default function HomePortals() {
   return (
-    <section className="saga-section" style={{ paddingTop: "2.5rem", paddingBottom: "3rem" }}>
+    <section className="saga-section" style={{ paddingTop: "2rem", paddingBottom: "2.5rem" }}>
       <div className="saga-container">
         <div className="saga-portal-grid">
           {PORTALS.map((p) => {
             const IconComp = p.icon;
             return (
               <div key={p.id} className="saga-portal-card">
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.85rem" }}>
                   <div className="saga-portal-icon-wrap">
-                    <IconComp size={24} />
+                    <IconComp size={22} />
                   </div>
                   <span className="saga-portal-badge">{p.badge}</span>
                 </div>
-                <h3 style={{ fontSize: "1.3rem", fontWeight: 750, margin: "0 0 0.5rem" }}>{p.title}</h3>
-                <p style={{ fontSize: "0.925rem", color: "var(--text-muted)", lineHeight: 1.55, margin: "0 0 1.5rem", flexGrow: 1 }}>
+                <h3 style={{ fontSize: "1.2rem", fontWeight: 750, margin: "0 0 0.4rem" }}>{p.title}</h3>
+                <p style={{ fontSize: "0.875rem", color: "var(--text-muted)", lineHeight: 1.5, margin: "0 0 1.25rem", flexGrow: 1 }}>
                   {p.desc}
                 </p>
                 <Link to={p.to} className="saga-btn saga-btn-outline" style={{ width: "100%", justifyContent: "space-between" }}>
                   <span>{p.btnText}</span>
-                  <ArrowRightIcon size={16} />
+                  <ArrowRightIcon size={15} />
                 </Link>
               </div>
             );
@@ -62,4 +62,3 @@ export default function HomePortals() {
     </section>
   );
 }
-

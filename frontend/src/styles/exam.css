@@ -40,7 +40,7 @@
 .exam-meta li:not(:last-child)::after {
   content: "•";
   margin-left: 0.85rem;
-  color: #cbd5e1;
+  color: var(--border-color);
 }
 
 .timer-bar {
@@ -83,7 +83,7 @@
   justify-content: center;
   background: var(--bg-surface);
   color: var(--text-main);
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
   font-weight: 600;
   font-size: 0.85rem;
@@ -91,8 +91,8 @@
   transition: all 0.15s ease;
 }
 
-.nav-dot:hover { background: #f1f5f9; border-color: #94a3b8; }
-.nav-dot.answered { background: #ecfdf5; border-color: #34d399; color: #065f46; }
+.nav-dot:hover { background: var(--bg-surface-elevated); border-color: var(--border-focus); }
+.nav-dot.answered { background: var(--success-bg); border-color: var(--success-border); color: var(--success-text); }
 .nav-dot.failed { background: #fef2f2; border-color: #f87171; color: #991b1b; }
 .nav-dot.current { outline: 2px solid var(--primary); outline-offset: 1px; }
 
@@ -136,8 +136,8 @@
   transition: all 0.15s ease;
 }
 
-.option:hover { background: #f8fafc; border-color: #cbd5e1; }
-.option.selected { border-color: var(--primary); background: #eff6ff; }
+.option:hover { background: var(--option-hover-bg); border-color: var(--border-focus); }
+.option.selected { border-color: var(--primary); background: var(--option-selected-bg); }
 .option input { margin-top: 0.25rem; cursor: pointer; }
 .option-letter { font-weight: 700; color: var(--text-muted); }
 .option-body { display: flex; flex-direction: column; flex: 1; min-width: 0; font-size: 0.95rem; }
@@ -176,7 +176,7 @@
 .results-table th {
   padding: 0.75rem 1rem;
   text-align: left;
-  background: #f8fafc;
+  background: var(--bg-page);
   color: var(--text-subtle);
   font-size: 0.75rem;
   font-weight: 700;
@@ -191,7 +191,7 @@
   border-bottom: 1px solid var(--border-color);
   color: var(--text-main);
 }
-.results-table tbody tr:hover td { background-color: #f1f5f9; }
+.results-table tbody tr:hover td { background-color: var(--bg-surface-elevated); }
 
 .q-list { padding-left: 1.25rem; }
 .q-item { margin-bottom: 1.25rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border-color); }

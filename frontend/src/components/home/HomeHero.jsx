@@ -8,9 +8,9 @@ const EXAM_TAGS = [
   "JEE Main",
   "JEE Advanced",
   "CBSE Class IX–XII",
-  "ICSE Private Batches",
-  "Foundation Class I–VIII",
-  "Chapter-wise Tests",
+  "ICSE Batches",
+  "Class I–VIII Foundation",
+  "Chapter Tests",
   "Weekly Test Series",
   "Monthly Review Mocks",
   "Full Mock Tests",
@@ -40,8 +40,7 @@ export default function HomeHero() {
             </p>
 
             <p className="saga-hero-lead">
-              A comprehensive educational initiative dedicated to providing quality academic
-              guidance, structured learning, and systematic online examination facilities.
+              Quality academic guidance, structured practice, and online examination facilities for board and entrance aspirants.
             </p>
 
             <div className="saga-hero-cta-group">
@@ -70,13 +69,13 @@ export default function HomeHero() {
                   <span className="dot yellow" />
                   <span className="dot green" />
                 </div>
-                <span className="saga-preview-title">Online Examination • Q14 • Physics</span>
+                <span className="saga-preview-title">Live Evaluation • Physics</span>
                 <span className="saga-preview-time">04:32</span>
               </div>
 
               <div className="saga-preview-body">
                 <p className="saga-preview-q">
-                  <strong>Q14.</strong> A convex lens of focal length 20 cm forms a real, inverted image at 60 cm. Calculate object distance and magnification.
+                  <strong>Q14.</strong> A convex lens of focal length 20 cm forms an image at 60 cm. Calculate object distance and magnification.
                 </p>
 
                 <div className="saga-rubric-list">
@@ -89,11 +88,7 @@ export default function HomeHero() {
                     <span className="saga-rubric-score"><CheckIcon size={12} /> 1/1</span>
                   </div>
                   <div className="saga-rubric-item">
-                    <span className="saga-rubric-text">Magnification: m = v/u = -2</span>
-                    <span className="saga-rubric-score"><CheckIcon size={12} /> 1/1</span>
-                  </div>
-                  <div className="saga-rubric-item">
-                    <span className="saga-rubric-text">Real &amp; inverted verified</span>
+                    <span className="saga-rubric-text">Magnification: m = -2</span>
                     <span className="saga-rubric-score"><CheckIcon size={12} /> 1/1</span>
                   </div>
                 </div>
@@ -101,12 +96,10 @@ export default function HomeHero() {
                 <div className="saga-preview-footer">
                   <div>
                     <span className="saga-feedback-badge">Instant Server Evaluation</span>
-                    <div className="saga-feedback-score">
-                      Score: 4 / 4 Marks
-                    </div>
+                    <div className="saga-feedback-score">Score: 3 / 3 Marks</div>
                   </div>
                   <Link to="/examinations" className="saga-btn saga-btn-primary saga-preview-btn">
-                    Try Real Test
+                    Try Test
                   </Link>
                 </div>
               </div>

@@ -24,6 +24,7 @@ export default function GuestTakeExam() {
 
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
+  const [retryTick, setRetryTick] = useState(0);
   const [result, setResult] = useState(null);
   const submittingRef = useRef(false);
 
@@ -32,13 +33,11 @@ export default function GuestTakeExam() {
     async function load() {
       const credential = readCredential(attemptId);
       if (!credential) { setPhase("nocredential"); return; }
-
       try {
         const data = await getGuestAttempt(attemptId, credential);
         if (cancelled) return;
         const att = data.attempt;
         setAttempt(att);
-
         const offsetMs = new Date(data.server_time).getTime() - Date.now();
         const expiresAtMs = new Date(att.expires_at).getTime();
 
@@ -50,7 +49,6 @@ export default function GuestTakeExam() {
 
         const qData = await getGuestQuestions(attemptId, credential);
         if (cancelled) return;
-
         const saved = {};
         for (const a of data.answers || []) saved[String(a.question_id)] = a.selected_option;
 
@@ -97,12 +95,13 @@ export default function GuestTakeExam() {
       setSubmitError(err.message);
       setSubmitting(false);
       submittingRef.current = false;
+      setTimeout(() => setRetryTick((t) => t + 1), 3000); // try again in 3 seconds
     }
   }, [attemptId]);
 
   useEffect(() => {
     if (secondsLeft === 0) finish();
-  }, [secondsLeft, finish]);
+  }, [secondsLeft, finish, retryTick]);
 
   async function persist(questionId, option) {
     const credential = readCredential(attemptId);
@@ -127,6 +126,12 @@ export default function GuestTakeExam() {
   }
 
   function handleSubmitClick() {
+    const failed = questions.filter((x) => saveStatus[x.id] === "failed").length;
+    if (failed > 0) {
+      window.alert(`${failed} answer(s) did not save. Press Retry on those questions first.`);
+      return;
+    }
+
     const unanswered = questions.filter((x) => !answers[x.id]).length;
     let msg = "Submit your practice attempt? Answers cannot be changed.";
     if (unanswered > 0) msg = `${unanswered} question(s) are unanswered.\n\n` + msg;

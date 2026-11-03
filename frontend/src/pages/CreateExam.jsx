@@ -15,6 +15,7 @@ export default function CreateExam() {
   const [accessMode, setAccessMode] = useState("graded");
   const [subjectId, setSubjectId] = useState("");
   const [subjects, setSubjects] = useState([]);
+  const [maxAttempts, setMaxAttempts] = useState("1");
 
   useEffect(() => {
     getMySubjects()
@@ -56,6 +57,7 @@ export default function CreateExam() {
         ends_at: endsAt ? new Date(endsAt).toISOString() : null,
         access_mode: accessMode,
         subject_id: subjectId ? Number(subjectId) : null,
+        max_attempts: Number(maxAttempts),
       });
       navigate(`/admin/exams/${data.exam.id}`, { replace: true });
     } catch (err) {
@@ -134,6 +136,19 @@ export default function CreateExam() {
             value={duration}
             onChange={(e) => setDuration(e.target.value)}
           />
+        </div>
+
+        <div className="field">
+          <label htmlFor="maxAttempts">Attempts allowed per student</label>
+          <select
+            id="maxAttempts"
+            value={maxAttempts}
+            onChange={(e) => setMaxAttempts(e.target.value)}
+          >
+            {[1, 2, 3, 4, 5].map((n) => (
+              <option key={n} value={n}>{n}</option>
+            ))}
+          </select>
         </div>
 
         <div className="field-row">

@@ -9,14 +9,15 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-    <!-- Prevent flash of wrong theme before React boots -->
+    <!-- Prevent flash of wrong theme before React boots; default is light mode -->
     <script>
       (function () {
         try {
           var saved = localStorage.getItem("tb-theme");
-          var prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-          if (saved === "dark" || (!saved && prefersDark)) {
+          if (saved === "dark") {
             document.documentElement.setAttribute("data-theme", "dark");
+          } else {
+            document.documentElement.removeAttribute("data-theme");
           }
         } catch (e) {}
       })();
