@@ -170,7 +170,7 @@ export async function getStudentOverview(studentId) {
 // ─────────────────────────────────────────────────────────────────────────────
 export async function getAdminExamList(adminId, isAdmin) {
   const { rows } = await pool.query(
-    `SELECT e.id, e.title, e.total_marks, e.is_published, e.access_mode,
+    `SELECT e.id, e.id AS exam_id, e.title, e.title AS exam_title, e.total_marks, e.is_published, e.access_mode,
             s.name AS subject_name,
             COUNT(DISTINCT a.id) FILTER (WHERE a.status = 'submitted') AS submitted_count
      FROM public.exams e

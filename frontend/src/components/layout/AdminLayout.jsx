@@ -1,6 +1,7 @@
-import { Link, Outlet, useNavigate } from "react-router";
+import { Link, NavLink, Outlet, useNavigate } from "react-router";
 import { useAdminAuth } from "../../context/AdminAuthContext.jsx";
 import SagaCityLogo from "../common/SagaCityLogo.jsx";
+import "../../pages/AdminDashboard.css";
 
 export default function AdminLayout() {
   const { admin, logoutAdmin } = useAdminAuth();
@@ -16,20 +17,31 @@ export default function AdminLayout() {
       <header className="admin-nav-header">
         <div className="admin-nav-container">
           <div className="admin-nav-brand">
-            <Link to="/admin" className="admin-brand-link">
+            <Link to="/admin" className="admin-brand-link" title="SagaCity Admin">
               <SagaCityLogo size={28} />
             </Link>
             <span className="badge admin admin-badge-tag">Admin Console</span>
           </div>
 
-          <nav className="admin-nav-links">
-            <Link to="/admin" className="button-link secondary admin-nav-btn">
+          <nav className="admin-nav-links" aria-label="Admin Navigation">
+            <NavLink
+              to="/admin"
+              end
+              className={({ isActive }) =>
+                `button-link admin-nav-btn ${isActive ? "active" : "secondary"}`
+              }
+            >
               Dashboard
-            </Link>
-            <Link to="/admin/performance" className="button-link secondary admin-nav-btn">
+            </NavLink>
+            <NavLink
+              to="/admin/performance"
+              className={({ isActive }) =>
+                `button-link admin-nav-btn ${isActive ? "active" : "secondary"}`
+              }
+            >
               Performance Analysis
-            </Link>
-            <Link to="/admin/exams/new" className="button-link admin-nav-btn">
+            </NavLink>
+            <Link to="/admin/exams/new" className="button-link admin-nav-btn" style={{ fontWeight: 700 }}>
               + New Test
             </Link>
           </nav>

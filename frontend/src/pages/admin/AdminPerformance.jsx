@@ -17,6 +17,15 @@ const DONUT_COLORS = ["#22c55e", "#ef4444", "#6b7280"];
 
 const BUCKET_LABELS = ["0–20%", "21–40%", "41–60%", "61–80%", "81–100%"];
 
+const tooltipStyle = {
+  backgroundColor: "var(--bg-surface, #1e293b)",
+  borderColor: "var(--border-color, rgba(128,128,128,0.2))",
+  color: "var(--text-main, #f8fafc)",
+  borderRadius: "6px",
+  fontSize: "0.85rem",
+  boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+};
+
 function bucketise(students) {
   const counts = [0, 0, 0, 0, 0];
   for (const s of students) {
@@ -35,10 +44,10 @@ function ScoreDistChart({ students }) {
   return (
     <ResponsiveContainer width="100%" height={200}>
       <BarChart data={data} margin={{ left: -10, right: 10, top: 5, bottom: 5 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+        <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color, rgba(128,128,128,0.2))" />
         <XAxis dataKey="label" tick={{ fontSize: 11 }} />
         <YAxis allowDecimals={false} tick={{ fontSize: 11 }} />
-        <Tooltip />
+        <Tooltip contentStyle={tooltipStyle} />
         <Bar dataKey="count" fill="#60a5fa" radius={[4, 4, 0, 0]} name="Students" />
       </BarChart>
     </ResponsiveContainer>
@@ -60,7 +69,7 @@ function DonutChart({ ov }) {
         <Pie data={data} cx="50%" cy="50%" innerRadius={55} outerRadius={85} paddingAngle={3} dataKey="value">
           {data.map((_, i) => <Cell key={i} fill={DONUT_COLORS[i % DONUT_COLORS.length]} />)}
         </Pie>
-        <Tooltip formatter={(v, n) => [v, n]} />
+        <Tooltip contentStyle={tooltipStyle} formatter={(v, n) => [v, n]} />
         <Legend iconType="circle" iconSize={10} />
       </PieChart>
     </ResponsiveContainer>
@@ -81,10 +90,10 @@ function TopStudentsChart({ students }) {
   return (
     <ResponsiveContainer width="100%" height={200}>
       <BarChart data={top20} margin={{ left: -10, right: 10, top: 5, bottom: 5 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+        <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color, rgba(128,128,128,0.2))" />
         <XAxis dataKey="name" tick={{ fontSize: 10 }} interval={0} angle={-30} textAnchor="end" height={40} />
         <YAxis tick={{ fontSize: 11 }} />
-        <Tooltip />
+        <Tooltip contentStyle={tooltipStyle} />
         <Bar dataKey="Score" fill="#22c55e" radius={[4, 4, 0, 0]} />
       </BarChart>
     </ResponsiveContainer>
@@ -124,10 +133,11 @@ export default function AdminPerformance() {
     setExamsLoading(true);
     getAdminExams()
       .then((res) => {
-        setExams(res.exams || []);
+        const list = res.exams || [];
+        setExams(list);
         // Restore from URL or default to first
         const urlExam = Number(searchParams.get("examId"));
-        const first = (res.exams || [])[0]?.exam_id;
+        const first = list[0]?.id ?? list[0]?.exam_id;
         setExamId(urlExam || first || null);
         setExamsLoading(false);
       })
@@ -136,6 +146,13 @@ export default function AdminPerformance() {
         setExamsLoading(false);
       });
   }, []); // eslint-disable-line
+
+  useEffect(() => {
+    const urlExam = Number(searchParams.get("examId"));
+    if (urlExam && urlExam !== examId) {
+      setExamId(urlExam);
+    }
+  }, [searchParams]);
 
   // Load per-exam data when examId changes
   const loadExamData = useCallback(() => {
@@ -226,10 +243,18 @@ export default function AdminPerformance() {
   if (!exams.length) {
     return (
       <div className="perf-page">
-        <h1>Performance Analytics</h1>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
+          <h1 style={{ margin: 0 }}>Performance Analytics</h1>
+          <button onClick={() => navigate("/admin")} className="secondary">
+            ← Back to Dashboard
+          </button>
+        </div>
         <div className="perf-empty">
-          <p>No published exams with submissions found.</p>
+          <p>No exams found to analyze.</p>
           <p>Publish an exam and wait for students to complete it.</p>
+          <button onClick={() => navigate("/admin")} className="primary" style={{ marginTop: "1rem" }}>
+            Go to Test Management
+          </button>
         </div>
       </div>
     );
@@ -252,24 +277,48 @@ export default function AdminPerformance() {
 
   return (
     <div className="perf-page">
-      <h1 style={{ marginBottom: "0.25rem" }}>Performance Analytics</h1>
-      <p style={{ color: "var(--text-muted,#888)", marginBottom: "1.5rem" }}>
-        Class overview and student breakdown by exam
-      </p>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "0.75rem", marginBottom: "0.5rem" }}>
+        <div>
+          <h1 style={{ margin: "0 0 0.25rem" }}>Performance Analytics</h1>
+          <p style={{ color: "var(--text-muted,#888)", margin: 0 }}>
+            Class overview and student breakdown by exam
+          </p>
+        </div>
+        <button
+          onClick={() => navigate("/admin")}
+          className="secondary"
+          style={{ fontSize: "0.85rem", padding: "0.4rem 0.85rem" }}
+        >
+          ← Back to Dashboard
+        </button>
+      </div>
 
       {/* Exam selector */}
-      <div className="perf-exam-selector" style={{ marginBottom: "1.5rem" }}>
-        <label htmlFor="admin-exam-select">Select exam:</label>
+      <div className="perf-exam-selector" style={{ margin: "1.25rem 0 1.5rem" }}>
+        <label htmlFor="admin-exam-select" style={{ fontWeight: 600 }}>Select exam:</label>
         <select
           id="admin-exam-select"
           value={examId || ""}
-          onChange={(e) => { setExamId(Number(e.target.value)); setSearch(""); setPage(1); setActiveTab("overview"); }}
+          onChange={(e) => {
+            const nextId = Number(e.target.value);
+            setExamId(nextId);
+            setSearchParams({ examId: nextId });
+            setSearch("");
+            setPage(1);
+            setActiveTab("overview");
+          }}
         >
-          {exams.map((ex) => (
-            <option key={ex.exam_id} value={ex.exam_id}>
-              {ex.exam_title}
-            </option>
-          ))}
+          {exams.map((ex) => {
+            const id = ex.id ?? ex.exam_id;
+            const title = ex.title ?? ex.exam_title ?? `Exam #${id}`;
+            const sub = ex.subject_name ? ` • ${ex.subject_name}` : "";
+            const subs = ex.submitted_count !== undefined ? ` (${ex.submitted_count} submitted)` : "";
+            return (
+              <option key={id} value={id}>
+                {title}{sub}{subs}
+              </option>
+            );
+          })}
         </select>
       </div>
 
