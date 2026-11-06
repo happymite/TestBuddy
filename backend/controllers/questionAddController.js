@@ -5,6 +5,7 @@ import { storeQuestionImages, removeQuestionImages, addSignedImageUrls } from ".
 export async function addQuestion(req, res) {
   const { question_text, option_a, option_b, option_c, option_d, correct_option } = req.body ?? {};
   const marks = Number(req.body?.marks ?? 1);
+  const negativeMarks = Number(req.body?.negative_marks ?? 0);
   const question_order = Number(req.body?.question_order ?? 1);
   const examId = Number(req.params.examId);
 
@@ -33,8 +34,18 @@ export async function addQuestion(req, res) {
   if (!["A", "B", "C", "D"].includes(correct_option)) {
     return res.status(400).json({ success: false, message: "Correct option must be A, B, C, or D." });
   }
-  if (!Number.isSafeInteger(marks) || marks <= 0 || !Number.isSafeInteger(question_order) || question_order <= 0) {
-    return res.status(400).json({ success: false, message: "Marks and question order must be positive whole numbers." });
+  if (
+    !Number.isSafeInteger(marks) ||
+    marks <= 0 ||
+    !Number.isSafeInteger(negativeMarks) ||
+    negativeMarks < 0 ||
+    !Number.isSafeInteger(question_order) ||
+    question_order <= 0
+  ) {
+    return res.status(400).json({
+      success: false,
+      message: "Marks must be positive and negative marks cannot be negative. Both must be whole numbers.",
+    });
   }
 
   try {
@@ -75,13 +86,13 @@ export async function addQuestion(req, res) {
          question_image_path, option_a_image_path, option_b_image_path,
          option_c_image_path, option_d_image_path
        )
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 0, $9, $10, $11, $12, $13, $14)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
        RETURNING id, exam_id, question_text, option_a, option_b, option_c, option_d,
                  correct_option, marks, negative_marks, question_order, question_image_path,
                  option_a_image_path, option_b_image_path, option_c_image_path, option_d_image_path`,
       [
         examId, question_text.trim(), optionTexts.A, optionTexts.B, optionTexts.C, optionTexts.D,
-        correct_option, marks, question_order,
+        correct_option, marks, negativeMarks, question_order,
         imagePaths.question_image_path ?? null,
         imagePaths.option_a_image_path ?? null,
         imagePaths.option_b_image_path ?? null,
@@ -107,4 +118,3 @@ export async function addQuestion(req, res) {
     client?.release();
   }
 }
-

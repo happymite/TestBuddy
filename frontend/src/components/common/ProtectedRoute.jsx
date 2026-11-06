@@ -1,6 +1,6 @@
 import { Navigate, Outlet } from "react-router";
-import { useAuth } from "../context/AuthContext.jsx";
-import { homePathFor } from "../utils/homePath.js";
+import { useAuth } from "../../context/AuthContext.jsx";
+import { homePathFor } from "../../utils/homePath.js";
 
 export default function ProtectedRoute({ role, allowedRoles }) {
   const { user, loading } = useAuth();

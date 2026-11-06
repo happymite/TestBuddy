@@ -1,16 +1,16 @@
 import { pool } from "../config/db.js";
 
-// Grades ONE attempt. The caller must already be inside a transaction
-// (BEGIN) and must have locked the attempt row (FOR UPDATE).
+// The caller must have an active transaction and a lock on the attempt row (FOR UPDATE).
 // "auto" is true when the system submits because time ran out.
 export async function gradeAttempt(client, attemptId, examId, auto) {
-  // 1. Mark each saved answer right or wrong, and award marks.
+  // Correct: +marks. Incorrect: -negative_marks. Unanswered: 0.
   await client.query(
     `UPDATE public.exam_answers ea
      SET is_correct = (ea.selected_option = q.correct_option),
          marks_awarded = CASE
+           WHEN ea.selected_option IS NULL THEN 0
            WHEN ea.selected_option = q.correct_option THEN q.marks
-           ELSE 0
+           ELSE -q.negative_marks
          END
      FROM public.questions q
      WHERE ea.question_id = q.id
@@ -18,7 +18,7 @@ export async function gradeAttempt(client, attemptId, examId, auto) {
     [attemptId],
   );
 
-  // 2. Close the attempt and store the total.
+  // Store the final score and the maximum possible marks.
   const result = await client.query(
     `UPDATE public.exam_attempts
      SET status = 'submitted',
@@ -39,21 +39,33 @@ export async function gradeAttempt(client, attemptId, examId, auto) {
     [attemptId, examId, auto],
   );
 
-  // 3. For guest students (student_id IS NULL), erase individual answer
-  // records so only guest_name and total score are kept in exam_attempts.
+  // For guest students (student_id IS NULL), capture the per-question breakdown
+  // BEFORE erasing answer records so the result page can show correct/wrong review.
+  let breakdown = null;
   if (result.rows[0]?.student_id === null) {
+    const bd = await client.query(
+      `SELECT ea.question_id, ea.selected_option, ea.is_correct,
+              ea.marks_awarded, q.correct_option, q.marks, q.negative_marks, q.question_text
+       FROM public.exam_answers ea
+       JOIN public.questions q ON q.id = ea.question_id
+       WHERE ea.attempt_id = $1
+       ORDER BY q.question_order ASC, q.id ASC`,
+      [attemptId],
+    );
+    breakdown = bd.rows;
+
     await client.query(
       `DELETE FROM public.exam_answers WHERE attempt_id = $1`,
       [attemptId],
     );
   }
 
-  return result.rows[0];
+  return { ...result.rows[0], breakdown };
 }
 
-// Grades every attempt whose time has run out but nobody submitted
-// (student closed the browser, lost internet, etc.).
-// Pass an examId to limit it to one exam, or nothing for all exams.
+// Automatically grade attempts whose timer has expired
+// (student closed the browser, lost network, etc.).
+// Pass an examId to target one exam, or nothing for all exams.
 export async function gradeExpiredAttempts(examId = null) {
   const client = await pool.connect();
 

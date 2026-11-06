@@ -1,9 +1,9 @@
 import { Link } from "react-router";
-import SagaCityLogo from "./SagaCityLogo.jsx";
+import SagaCityLogo from "../common/SagaCityLogo.jsx";
 import { CONTACT_PHONE } from "./navData.js";
-import { PhoneIcon, ClockIcon } from "./Icons.jsx";
-import { MapPinIcon, MailIcon } from "./FooterIcons.jsx";
-import "../styles/footer.css";
+import { PhoneIcon, ClockIcon } from "../common/Icons.jsx";
+import { MapPinIcon, MailIcon } from "../common/FooterIcons.jsx";
+import "../../styles/footer.css";
 
 export default function Footer() {
   return (

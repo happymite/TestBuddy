@@ -7,7 +7,7 @@ import {
   TrophyIcon,
   TargetIcon,
   ArrowRightIcon,
-} from "../Icons.jsx";
+} from "../common/Icons.jsx";
 
 const EXAM_TYPES = [
   {

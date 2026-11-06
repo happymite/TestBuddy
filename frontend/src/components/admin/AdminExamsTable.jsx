@@ -102,6 +102,9 @@ export default function AdminExamsTable({ exams, onTogglePublish, onDeleteExam }
                       <Link to={`/admin/exams/${e.id}/results`} className="button-link secondary admin-btn-sm">
                         Results
                       </Link>
+                      <Link to={`/admin/performance?examId=${e.id}`} className="button-link secondary admin-btn-sm">
+                        Analysis
+                      </Link>
                       <button onClick={() => handleCopy(e.id)} className="secondary admin-btn-sm">
                         {copiedId === e.id ? "Copied" : "Link"}
                       </button>

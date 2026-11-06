@@ -18,7 +18,6 @@ const EMPTY_FORM = {
   option_c: "",
   option_d: "",
   correct_option: "",
-  marks: "1",
 };
 
 const EMPTY_IMAGES = {
@@ -41,7 +40,9 @@ function LocalPreview({ file, alt }) {
   return <img src={url} alt={alt} style={{ display: "block", maxHeight: "160px", marginTop: "6px" }} />;
 }
 
-export default function QuestionForm({ onAddQuestion, isAdding }) {
+// defaultMarks and defaultNeg come from the exam — set when the exam is created.
+// Teachers do NOT configure marks per-question; all questions carry equal weight.
+export default function QuestionForm({ onAddQuestion, isAdding, defaultMarks = 1, defaultNeg = 0 }) {
   const [form, setForm] = useState(EMPTY_FORM);
   const [images, setImages] = useState(EMPTY_IMAGES);
   const [inputKey, setInputKey] = useState(0);
@@ -84,8 +85,9 @@ export default function QuestionForm({ onAddQuestion, isAdding }) {
 
     setError("");
     try {
-      await onAddQuestion(form, images);
-      setForm({ ...EMPTY_FORM, marks: form.marks });
+      // Pass exam-level defaults; the form does not expose per-question mark fields.
+      await onAddQuestion({ ...form, marks: defaultMarks, negative_marks: defaultNeg }, images);
+      setForm(EMPTY_FORM);
       setImages(EMPTY_IMAGES);
       setInputKey((k) => k + 1);
     } catch (err) {
@@ -95,9 +97,16 @@ export default function QuestionForm({ onAddQuestion, isAdding }) {
 
   return (
     <form className="form-card" onSubmit={handleSubmit}>
-      <h2>Add a New Question</h2>
+      <h2>Add a question</h2>
+
+      {/* Marking scheme inherited from exam — read-only display */}
+      <p className="hint" style={{ marginBottom: "1rem" }}>
+        Marking scheme: <strong>+{defaultMarks}</strong> correct &nbsp;|&nbsp;
+        <strong>-{defaultNeg}</strong> wrong &nbsp;|&nbsp; 0 skipped
+      </p>
+
       <div className="field">
-        <label htmlFor="q_text">Question Prompt</label>
+        <label htmlFor="q_text">Question prompt</label>
         <textarea id="q_text" name="question_text" rows={3} value={form.question_text} onChange={handleChange} required />
       </div>
 
@@ -120,7 +129,7 @@ export default function QuestionForm({ onAddQuestion, isAdding }) {
       })}
 
       <fieldset className="correct-picker">
-        <legend>Select Correct Option</legend>
+        <legend>Correct answer</legend>
         {LETTERS.map((letter) => (
           <label key={letter} style={{ marginRight: "1rem" }}>
             <input type="radio" name="correct_option" value={letter} checked={form.correct_option === letter} onChange={handleChange} /> {letter}
@@ -128,16 +137,10 @@ export default function QuestionForm({ onAddQuestion, isAdding }) {
         ))}
       </fieldset>
 
-      <div className="field">
-        <label htmlFor="marks">Marks Weightage</label>
-        <input id="marks" name="marks" type="number" min="1" value={form.marks} onChange={handleChange} required />
-      </div>
-
       {error && <p className="error" role="alert">{error}</p>}
       <button type="submit" disabled={isAdding}>
-        {isAdding ? "Saving Question..." : "Add Question"}
+        {isAdding ? "Saving..." : "Add question"}
       </button>
     </form>
   );
 }
-

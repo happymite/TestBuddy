@@ -1,5 +1,5 @@
 import { Link } from "react-router";
-import { ClockIcon, BookOpenIcon, TrophyIcon, ArrowRightIcon } from "../Icons.jsx";
+import { ClockIcon, BookOpenIcon, TrophyIcon, ArrowRightIcon } from "../common/Icons.jsx";
 
 const PORTALS = [
   {

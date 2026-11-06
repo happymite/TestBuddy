@@ -1,51 +1,50 @@
-import { TargetIcon, BookOpenIcon, CheckIcon } from "../Icons.jsx";
+import { TargetIcon, BookOpenIcon, CheckIcon } from "../common/Icons.jsx";
 
 export default function HomeAbout() {
   return (
     <section className="saga-section saga-section-alt" id="about">
       <div className="saga-container">
         <div className="saga-section-head">
-          <h2>About SAGA CITY</h2>
-          <p>Quality academic guidance, disciplined learning, and systematic examination facilities.</p>
+          <h2>Academic Standards &amp; Approach</h2>
+          <p>Structured curriculum, regular testing, and personalized student guidance.</p>
         </div>
 
         {/* Introduction */}
         <div className="saga-intro-card" id="about-intro">
           <div className="saga-intro-content">
-            <h3>Our Focus</h3>
+            <h3>About SAGA CITY</h3>
             <p className="saga-intro-text">
-              <strong>SAGA CITY</strong> is an educational initiative dedicated to providing quality
-              academic guidance, structured learning, and systematic examination facilities.
-              We help students learn, practise, and evaluate their performance through timed online examinations,
-              chapter-wise tests, and model question banks.
+              <strong>SAGA CITY</strong> is an academic coaching and online testing platform.
+              We support students across CBSE, ICSE, and competitive exam tracks with disciplined
+              classroom guidance, chapter-wise worksheets, and server-graded online examination facilities.
             </p>
           </div>
         </div>
 
-        {/* Mission and Vision Grid */}
+        {/* Focus Areas */}
         <div className="saga-mission-vision-grid">
           <div className="saga-mv-card" id="about-mission">
             <div className="saga-mv-header">
               <div className="saga-mv-icon-wrap"><TargetIcon size={18} /></div>
-              <h3>Our Mission</h3>
+              <h3>Structured Curriculum</h3>
             </div>
-            <p className="saga-mv-quote">
-              &ldquo;To provide quality education, regular assessment and equal learning opportunities.&rdquo;
+            <p className="saga-mv-detail">
+              Comprehensive chapter coverage tailored to school boards and competitive entrance exams, with regular homework evaluation and problem-solving drills.
             </p>
           </div>
 
           <div className="saga-mv-card" id="about-vision">
             <div className="saga-mv-header">
               <div className="saga-mv-icon-wrap"><BookOpenIcon size={18} /></div>
-              <h3>Our Vision</h3>
+              <h3>Continuous Assessment</h3>
             </div>
-            <p className="saga-mv-quote">
-              &ldquo;To build a platform that empowers students through knowledge, discipline and continuous academic development.&rdquo;
+            <p className="saga-mv-detail">
+              Weekly chapter tests, full mock exam series, and immediate scorecard reviews to help students identify weak areas and track growth over time.
             </p>
           </div>
         </div>
 
-        {/* Why Choose Us */}
+        {/* Key Features */}
         <div className="saga-why-block" id="about-why">
           <h3 className="saga-why-title">Why Choose SAGA CITY</h3>
           <div className="saga-why-grid">
@@ -53,28 +52,28 @@ export default function HomeAbout() {
               <div className="saga-check-icon-wrap"><CheckIcon size={14} /></div>
               <div>
                 <strong>Systematic Testing</strong>
-                <p>Weekly, monthly, and full mock test series with instant score review.</p>
+                <p>Timed exams with question navigation palette, mark-for-review, and auto-submission.</p>
               </div>
             </div>
             <div className="saga-why-item">
               <div className="saga-check-icon-wrap"><CheckIcon size={14} /></div>
               <div>
                 <strong>Curated Question Banks</strong>
-                <p>Subject-wise questions, formulas, and past year board papers.</p>
+                <p>Subject-wise question banks, formula sheets, and past year examination papers.</p>
               </div>
             </div>
             <div className="saga-why-item">
               <div className="saga-check-icon-wrap"><CheckIcon size={14} /></div>
               <div>
-                <strong>Private Batches</strong>
-                <p>Focused ICSE and CBSE batches with individual mentor attention.</p>
+                <strong>Small Batch Sizes</strong>
+                <p>Focused group teaching with direct teacher interaction and personal doubt resolution.</p>
               </div>
             </div>
             <div className="saga-why-item">
               <div className="saga-check-icon-wrap"><CheckIcon size={14} /></div>
               <div>
-                <strong>Direct Guidance</strong>
-                <p>Personalized performance tracking and dedicated doubt-clearing desk.</p>
+                <strong>Performance Analytics</strong>
+                <p>Detailed scorecards with correct answers, time management, and topic-level accuracy.</p>
               </div>
             </div>
           </div>

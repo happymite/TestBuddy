@@ -1,4 +1,4 @@
-import { CONTACT_PHONE } from "../navData.js";
+import { CONTACT_PHONE } from "../layout/navData.js";
 
 const COURSES_DATA = [
   {

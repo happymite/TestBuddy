@@ -1,11 +1,11 @@
 import { lazy, Suspense } from "react";
 import { Routes, Route, Navigate } from "react-router";
-import ProtectedRoute from "./components/ProtectedRoute.jsx";
-import AdminProtectedRoute from "./components/AdminProtectedRoute.jsx";
-import Layout from "./components/Layout.jsx";
-import AdminLayout from "./components/AdminLayout.jsx";
-import ErrorBoundary from "./components/ErrorBoundary.jsx";
-import PageLoader from "./components/PageLoader.jsx";
+import ProtectedRoute from "./components/common/ProtectedRoute.jsx";
+import AdminProtectedRoute from "./components/common/AdminProtectedRoute.jsx";
+import Layout from "./components/layout/Layout.jsx";
+import AdminLayout from "./components/layout/AdminLayout.jsx";
+import ErrorBoundary from "./components/common/ErrorBoundary.jsx";
+import PageLoader from "./components/common/PageLoader.jsx";
 
 // Route-Level Lazy Loading (Code Splitting)
 const Home = lazy(() => import("./pages/Home.jsx"));
@@ -25,6 +25,9 @@ const ManageQuestions = lazy(() => import("./pages/ManageQuestions.jsx"));
 const PublicExam = lazy(() => import("./pages/publicExam.jsx"));
 const GuestTakeExam = lazy(() => import("./pages/guestTakeExam.jsx"));
 const ExamResults = lazy(() => import("./pages/ExamResults.jsx"));
+const PerformanceAnalysis = lazy(() => import("./pages/performance/PerformanceAnalysis.jsx"));
+const AdminPerformance = lazy(() => import("./pages/admin/AdminPerformance.jsx"));
+const AdminStudentDetail = lazy(() => import("./pages/admin/AdminStudentDetail.jsx"));
 
 export default function App() {
   return (
@@ -36,7 +39,7 @@ export default function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/admin/login" element={<AdminLogin />} />
 
-          {/* Guest Assessment Route */}
+          {/* Guest/Practice Assessment Route (Distraction-Free) */}
           <Route path="/guest/attempts/:attemptId/take" element={<GuestTakeExam />} />
 
           {/* Live Student Exam (Distraction-Free, No Navbar) */}
@@ -54,6 +57,7 @@ export default function App() {
             <Route element={<ProtectedRoute role="student" />}>
               <Route path="/dashboard" element={<StudentDashboard />} />
               <Route path="/attempts/:attemptId/result" element={<ExamResult />} />
+              <Route path="/performance" element={<PerformanceAnalysis />} />
             </Route>
           </Route>
 
@@ -64,6 +68,8 @@ export default function App() {
               <Route path="/admin/exams/new" element={<CreateExam />} />
               <Route path="/admin/exams/:examId" element={<ManageQuestions />} />
               <Route path="/admin/exams/:examId/results" element={<ExamResults />} />
+              <Route path="/admin/performance" element={<AdminPerformance />} />
+              <Route path="/admin/performance/:examId/student/:studentId" element={<AdminStudentDetail />} />
 
               {/* Legacy aliases */}
               <Route path="/teacher" element={<Navigate to="/admin" replace />} />

@@ -1,6 +1,6 @@
 import { Link } from "react-router";
 import { useAuth } from "../context/AuthContext.jsx";
-import { TrophyIcon, ChartBarIcon, TargetIcon, UserIcon, ArrowRightIcon } from "../components/Icons.jsx";
+import { TrophyIcon, ChartBarIcon, TargetIcon, UserIcon, ArrowRightIcon } from "../components/common/Icons.jsx";
 
 const PILLARS = [
   { title: "Instant Automated Evaluation", icon: TargetIcon, text: "Exams are scored server-side the moment time expires or the candidate submits." },

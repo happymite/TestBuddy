@@ -10,6 +10,8 @@ export default function CreateExam() {
   const [duration, setDuration] = useState("60");
   const [startsAt, setStartsAt] = useState("");
   const [endsAt, setEndsAt] = useState("");
+  const [defaultMarks, setDefaultMarks] = useState("1");
+  const [defaultNeg, setDefaultNeg] = useState("0");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [accessMode, setAccessMode] = useState("graded");
@@ -58,8 +60,11 @@ export default function CreateExam() {
         access_mode: accessMode,
         subject_id: subjectId ? Number(subjectId) : null,
         max_attempts: Number(maxAttempts),
+        default_marks: Number(defaultMarks),
+        default_negative_marks: Number(defaultNeg),
       });
-      navigate(`/admin/exams/${data.exam.id}`, { replace: true });
+      const query = `?defaultMarks=${defaultMarks}&defaultNeg=${defaultNeg}`;
+      navigate(`/admin/exams/${data.exam.id}${query}`, { replace: true });
     } catch (err) {
       setError(err.message);
       setSubmitting(false);
@@ -136,6 +141,32 @@ export default function CreateExam() {
             value={duration}
             onChange={(e) => setDuration(e.target.value)}
           />
+        </div>
+        <div className="field-row">
+          <div className="field">
+            <label htmlFor="defaultMarks">Marks per correct answer</label>
+            <input
+              id="defaultMarks"
+              type="number"
+              min="1"
+              step="1"
+              required
+              value={defaultMarks}
+              onChange={(e) => setDefaultMarks(e.target.value)}
+            />
+          </div>
+          <div className="field">
+            <label htmlFor="defaultNegativeMarks">Marks deducted per wrong answer</label>
+            <input
+              id="defaultNegativeMarks"
+              type="number"
+              min="0"
+              step="1"
+              required
+              value={defaultNeg}
+              onChange={(e) => setDefaultNeg(e.target.value)}
+            />
+          </div>
         </div>
 
         <div className="field">

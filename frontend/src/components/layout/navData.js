@@ -53,7 +53,7 @@ export const NAV_FLOW = [
       { label: "Latest Results", href: "/results" },
       { label: "Individual Results", href: "/results" },
       { label: "Merit List", href: "/results" },
-      { label: "Performance Analysis", href: "/results" },
+      { label: "Performance Analysis", href: "/performance" },
     ],
   },
   {

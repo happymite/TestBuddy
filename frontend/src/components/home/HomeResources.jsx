@@ -9,7 +9,7 @@ import {
   FolderIcon,
   BookOpenIcon,
   TargetIcon,
-} from "../Icons.jsx";
+} from "../common/Icons.jsx";
 
 const QUESTION_BANKS = [
   { subject: "Physics", icon: AtomIcon, topics: "Mechanics, Electrodynamics, Optics, Thermodynamics, Modern Physics" },

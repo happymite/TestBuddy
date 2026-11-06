@@ -45,7 +45,8 @@ export default function AdminSubjectsTable() {
   }
 
   async function handleDelete(subject) {
-    if (!window.confirm(`Delete subject "${subject.name}"? Tests will become uncategorised.`)) return;
+    if (!window.confirm(`Delete subject "${subject.name}"? Tests will become uncategorised.`)) 
+      return;
     setError("");
     setMsg("");
     try {

@@ -1,21 +1,15 @@
 import { Link } from "react-router";
-import { CONTACT_PHONE } from "../navData.js";
-import { GraduationCapLogoIcon } from "../SagaCityLogo.jsx";
-import { PhoneIcon, ArrowRightIcon, CheckIcon } from "../Icons.jsx";
+import { CONTACT_PHONE } from "../layout/navData.js";
+import { GraduationCapLogoIcon } from "../common/SagaCityLogo.jsx";
+import { PhoneIcon, ArrowRightIcon, CheckIcon, ClockIcon, BookOpenIcon } from "../common/Icons.jsx";
 
 const EXAM_TAGS = [
-  "NEET",
-  "JEE Main",
-  "JEE Advanced",
   "CBSE Class IX–XII",
   "ICSE Batches",
+  "NEET Foundation",
+  "JEE Main",
   "Class I–VIII Foundation",
-  "Chapter Tests",
   "Weekly Test Series",
-  "Monthly Review Mocks",
-  "Full Mock Tests",
-  "State Boards",
-  "Olympiads & NTSE",
 ];
 
 export default function HomeHero() {
@@ -26,27 +20,27 @@ export default function HomeHero() {
           {/* Left Column: Headlines & Actions */}
           <div className="saga-hero-left">
             <div className="saga-hero-badge">
-              <GraduationCapLogoIcon size={18} />
-              <span>SAGA CITY • ACADEMIC &amp; EXAM PORTAL</span>
+              <GraduationCapLogoIcon size={16} />
+              <span>ACADEMIC &amp; EXAMINATION PORTAL</span>
             </div>
 
             <h1 className="saga-hero-title">
-              Learn Today. <br />
-              <span className="saga-hero-color-lead">Lead Tomorrow.</span>
+              Academic Coaching &amp; <br />
+              <span className="saga-hero-color-lead">Online Examination</span> Portal
             </h1>
 
-            <p className="saga-hero-motto">
-              LEARN • PRACTISE • EVALUATE • EXCEL
-            </p>
-
             <p className="saga-hero-lead">
-              Quality academic guidance, structured practice, and online examination facilities for board and entrance aspirants.
+              Structured preparation for school boards and entrance tests. Practice timed mock exams, access study materials, and track academic progress.
             </p>
 
             <div className="saga-hero-cta-group">
-              <Link to="/login" className="saga-btn saga-btn-primary">
-                <span>Enter Student Portal</span>
+              <Link to="/examinations" className="saga-btn saga-btn-primary">
+                <span>Browse Examinations</span>
                 <ArrowRightIcon size={16} />
+              </Link>
+
+              <Link to="/login" className="saga-btn saga-btn-outline">
+                <span>Student Portal</span>
               </Link>
 
               <a href={`tel:${CONTACT_PHONE}`} className="saga-btn saga-btn-outline">
@@ -56,11 +50,11 @@ export default function HomeHero() {
             </div>
 
             <p className="saga-hero-micro">
-              Official Helpline: <strong>{CONTACT_PHONE}</strong> • Admissions &amp; Enquiries
+              Admissions &amp; Academic Inquiries: <strong>{CONTACT_PHONE}</strong>
             </p>
           </div>
 
-          {/* Right Column: High-fidelity Live Evaluation Card */}
+          {/* Right Column: Portal Overview Card */}
           <div className="saga-hero-right">
             <div className="saga-preview-window">
               <div className="saga-preview-header">
@@ -69,37 +63,42 @@ export default function HomeHero() {
                   <span className="dot yellow" />
                   <span className="dot green" />
                 </div>
-                <span className="saga-preview-title">Live Evaluation • Physics</span>
-                <span className="saga-preview-time">04:32</span>
+                <span className="saga-preview-title">Assessment Engine</span>
+                <span className="saga-preview-time">LIVE</span>
               </div>
 
               <div className="saga-preview-body">
-                <p className="saga-preview-q">
-                  <strong>Q14.</strong> A convex lens of focal length 20 cm forms an image at 60 cm. Calculate object distance and magnification.
-                </p>
-
                 <div className="saga-rubric-list">
                   <div className="saga-rubric-item">
-                    <span className="saga-rubric-text">Lens formula: 1/f = 1/v - 1/u</span>
-                    <span className="saga-rubric-score"><CheckIcon size={12} /> 1/1</span>
+                    <span className="saga-rubric-text">
+                      <ClockIcon size={14} style={{ marginRight: "0.35rem", verticalAlign: "middle" }} />
+                      Timed CBT Exam Interface with Palette
+                    </span>
+                    <span className="saga-rubric-score"><CheckIcon size={12} /> Active</span>
                   </div>
                   <div className="saga-rubric-item">
-                    <span className="saga-rubric-text">Object distance: u = -30 cm</span>
-                    <span className="saga-rubric-score"><CheckIcon size={12} /> 1/1</span>
+                    <span className="saga-rubric-text">
+                      <CheckIcon size={14} style={{ marginRight: "0.35rem", verticalAlign: "middle" }} />
+                      Instant Server-side Grading &amp; Review
+                    </span>
+                    <span className="saga-rubric-score"><CheckIcon size={12} /> Active</span>
                   </div>
                   <div className="saga-rubric-item">
-                    <span className="saga-rubric-text">Magnification: m = -2</span>
-                    <span className="saga-rubric-score"><CheckIcon size={12} /> 1/1</span>
+                    <span className="saga-rubric-text">
+                      <BookOpenIcon size={14} style={{ marginRight: "0.35rem", verticalAlign: "middle" }} />
+                      Curated Formula Sheets &amp; Question Banks
+                    </span>
+                    <span className="saga-rubric-score"><CheckIcon size={12} /> Ready</span>
                   </div>
                 </div>
 
                 <div className="saga-preview-footer">
                   <div>
-                    <span className="saga-feedback-badge">Instant Server Evaluation</span>
-                    <div className="saga-feedback-score">Score: 3 / 3 Marks</div>
+                    <span className="saga-feedback-badge">Free Practice Access</span>
+                    <div className="saga-feedback-score">No Account Required</div>
                   </div>
                   <Link to="/examinations" className="saga-btn saga-btn-primary saga-preview-btn">
-                    Try Test
+                    Start a Test &rarr;
                   </Link>
                 </div>
               </div>

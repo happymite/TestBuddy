@@ -2,7 +2,7 @@ import { useEffect, useState, useMemo } from "react";
 import { Link, useNavigate } from "react-router";
 import { getPublishedExams, startAttempt } from "../api/exam.js";
 import { useAuth } from "../context/AuthContext.jsx";
-import { ClockIcon, TargetIcon, ArrowRightIcon, BookOpenIcon, TrophyIcon } from "../components/Icons.jsx";
+import { ClockIcon, TargetIcon, ArrowRightIcon, BookOpenIcon, TrophyIcon } from "../components/common/Icons.jsx";
 import "./StudentDashboard.css";
 
 function scheduleLabel(exam) {
@@ -99,7 +99,7 @@ export default function StudentDashboard() {
         <div>
           <span className="saga-dashboard-badge">SAGA CITY STUDENT PORTAL</span>
           <h1>Welcome, {user?.name || "Student"}</h1>
-          <p>Learn Today. Lead Tomorrow. — Official Academic &amp; Assessment Desk</p>
+          <p>Scheduled examinations, practice tests, and performance results.</p>
         </div>
         <div className="dashboard-quick-actions">
           <Link to="/study-materials" className="saga-btn saga-btn-outline quick-link-btn">
@@ -107,6 +107,9 @@ export default function StudentDashboard() {
           </Link>
           <Link to="/results" className="saga-btn saga-btn-outline quick-link-btn">
             <TrophyIcon size={15} /> <span>My Results</span>
+          </Link>
+          <Link to="/performance" className="saga-btn saga-btn-outline quick-link-btn">
+            <TargetIcon size={15} /> <span>Performance Analysis</span>
           </Link>
         </div>
       </div>

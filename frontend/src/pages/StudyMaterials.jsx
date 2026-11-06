@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router";
-import { DocumentIcon, FolderIcon, BookOpenIcon, TargetIcon, AtomIcon, FlaskIcon, MathIcon, LeafIcon } from "../components/Icons.jsx";
+import { DocumentIcon, FolderIcon, BookOpenIcon, TargetIcon, AtomIcon, FlaskIcon, MathIcon, LeafIcon } from "../components/common/Icons.jsx";
 
 const MATERIALS = [
   { id: 1, title: "Class XII Physics: Electrodynamics & Optics Formula Sheet", subject: "Physics", type: "PDF", icon: AtomIcon },

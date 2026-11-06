@@ -1,6 +1,5 @@
 import { request } from "./client.js";
 
-// Guest requests prove identity with "Guest <credential>", not a JWT.
 function guestHeaders(credential) {
   return { Authorization: `Guest ${credential}` };
 }

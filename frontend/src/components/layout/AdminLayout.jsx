@@ -1,6 +1,6 @@
 import { Link, Outlet, useNavigate } from "react-router";
-import { useAdminAuth } from "../context/AdminAuthContext.jsx";
-import SagaCityLogo from "./SagaCityLogo.jsx";
+import { useAdminAuth } from "../../context/AdminAuthContext.jsx";
+import SagaCityLogo from "../common/SagaCityLogo.jsx";
 
 export default function AdminLayout() {
   const { admin, logoutAdmin } = useAdminAuth();
@@ -25,6 +25,9 @@ export default function AdminLayout() {
           <nav className="admin-nav-links">
             <Link to="/admin" className="button-link secondary admin-nav-btn">
               Dashboard
+            </Link>
+            <Link to="/admin/performance" className="button-link secondary admin-nav-btn">
+              Performance Analysis
             </Link>
             <Link to="/admin/exams/new" className="button-link admin-nav-btn">
               + New Test

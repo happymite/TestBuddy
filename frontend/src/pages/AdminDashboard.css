@@ -111,3 +111,14 @@
     width: 100%; justify-content: center; text-align: center; min-height: 38px;
   }
 }
+
+
+/* Marks + negative-marks side-by-side in QuestionForm */
+.qf-marks-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+@media (max-width: 480px) {
+  .qf-marks-row { grid-template-columns: 1fr; }
+}

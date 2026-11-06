@@ -1,11 +1,18 @@
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router";
+import { Link, useParams, useLocation } from "react-router";
 import { addQuestion, deleteQuestion, getExamForOwner, publishExam } from "../api/teacher.js";
 import QuestionItem from "../components/admin/QuestionItem.jsx";
 import QuestionForm from "../components/admin/QuestionForm.jsx";
 
 export default function ManageQuestions() {
   const { examId } = useParams();
+  const location = useLocation();
+
+  // Read exam-level marking defaults passed from CreateExam via URL query string.
+  const qs = new URLSearchParams(location.search);
+  const urlDefaultMarks = Number(qs.get("defaultMarks") || 1);
+  const urlDefaultNeg   = Number(qs.get("defaultNeg") || 0);
+
   const [exam, setExam] = useState(null);
   const [questions, setQuestions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -42,7 +49,9 @@ export default function ManageQuestions() {
         option_c: form.option_c.trim(),
         option_d: form.option_d.trim(),
         correct_option: form.correct_option,
-        marks: Number(form.marks),
+        // All questions use exam-level defaults; no per-question override.
+        marks: form.marks,
+        negative_marks: form.negative_marks,
         question_order: nextOrder,
         ...images,
       });
@@ -53,7 +62,7 @@ export default function ManageQuestions() {
   }
 
   async function handleDelete(question) {
-    if (!window.confirm(`Delete question "${question.question_text}"?`)) return;
+    if (!window.confirm(`Delete "${question.question_text}"?`)) return;
     try {
       await deleteQuestion(examId, question.id);
       setReloadKey((k) => k + 1);
@@ -106,7 +115,7 @@ export default function ManageQuestions() {
         </h1>
         {exam.is_published && (
           <Link to={`/admin/exams/${exam.id}/results`} className="button-link secondary">
-            View Candidate Results &rarr;
+            View results &rarr;
           </Link>
         )}
       </div>
@@ -114,15 +123,16 @@ export default function ManageQuestions() {
       {exam.description && <p className="exam-desc">{exam.description}</p>}
 
       <ul className="exam-meta">
-        <li>Duration: {exam.duration_minutes} mins</li>
-        <li>{questions.length} questions</li>
+        <li>Duration: {exam.duration_minutes} min</li>
+        <li>{questions.length} question{questions.length !== 1 ? "s" : ""}</li>
         <li>{totalMarks} total marks</li>
+        <li>+{urlDefaultMarks} / -{urlDefaultNeg} per question</li>
         <li>Mode: <strong>{exam.access_mode}</strong></li>
       </ul>
 
-      <h2 style={{ marginTop: "1.5rem" }}>Questions in Assessment</h2>
+      <h2 style={{ marginTop: "1.5rem" }}>Questions</h2>
       {questions.length === 0 ? (
-        <p className="empty-state">No questions added yet. Use the form below to add questions.</p>
+        <p className="empty-state">No questions yet. Use the form below to add questions.</p>
       ) : (
         <ol className="q-list">
           {questions.map((q) => (
@@ -138,16 +148,22 @@ export default function ManageQuestions() {
 
       {!exam.is_published && (
         <>
-          <QuestionForm onAddQuestion={handleAdd} isAdding={adding} />
+          {/* Pass exam defaults so QuestionForm shows the correct marking scheme */}
+          <QuestionForm
+            onAddQuestion={handleAdd}
+            isAdding={adding}
+            defaultMarks={urlDefaultMarks}
+            defaultNeg={urlDefaultNeg}
+          />
           <div className="form-card" style={{ marginTop: "1.5rem" }}>
-            <h2>Publish Assessment</h2>
+            <h2>Publish assessment</h2>
             <p className="hint">
               {questions.length === 0
-                ? "Add at least one question to publish this test."
-                : "Publishing makes the test immediately accessible to students."}
+                ? "Add at least one question before publishing."
+                : "Publishing makes the exam immediately accessible to candidates."}
             </p>
             <button onClick={handlePublish} disabled={publishing || questions.length === 0}>
-              {publishing ? "Publishing..." : "Publish Exam"}
+              {publishing ? "Publishing..." : "Publish exam"}
             </button>
           </div>
         </>

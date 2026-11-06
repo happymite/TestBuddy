@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { getPublishedExams, startAttempt } from "../api/exam.js";
 import { useAuth } from "../context/AuthContext.jsx";
-import { ClockIcon, TargetIcon, ArrowRightIcon } from "../components/Icons.jsx";
+import { ClockIcon, TargetIcon, ArrowRightIcon } from "../components/common/Icons.jsx";
 import "./StudentDashboard.css";
 
 export default function Examinations() {

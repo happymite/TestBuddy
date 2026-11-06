@@ -1,24 +1,18 @@
-import { CONTACT_PHONE } from "../navData.js";
-import { PhoneIcon } from "../Icons.jsx";
+import { CONTACT_PHONE } from "../layout/navData.js";
+import { PhoneIcon } from "../common/Icons.jsx";
 
 const NOTICES = [
   {
-    date: "02 NOV 2026",
-    badge: "Important",
-    title: "Upcoming Weekly Test Series Scheduled for Class IX, X, XI & XII",
-    body: "Please check your student dashboard or examination portal for subject timings and chapter allocations.",
+    date: "Active",
+    badge: "Assessments",
+    title: "Weekly Practice & Test Series Available",
+    body: "Subject-wise mock exams are open on the examinations portal for CBSE, ICSE, and foundation batches.",
   },
   {
-    date: "01 NOV 2026",
-    badge: "Admissions",
-    title: "New ICSE & CBSE Private Batches Enrollment Open",
-    body: `Limited batch sizes for personalized guidance. Call the guidance desk directly at ${CONTACT_PHONE}.`,
-  },
-  {
-    date: "28 OCT 2026",
-    badge: "Exam Alert",
-    title: "NEET & JEE Foundation Mock Papers Uploaded to Question Bank",
-    body: "Students can access model questions and previous year papers inside the study materials portal.",
+    date: "Admissions",
+    badge: "Batches",
+    title: "New Academic Coaching Batches Open",
+    body: `Limited batch sizes for personalized coaching. Contact the guidance desk directly at ${CONTACT_PHONE}.`,
   },
 ];
 
@@ -27,8 +21,8 @@ export default function HomeNoticesContact() {
     <section className="saga-section saga-section-alt" id="notices">
       <div className="saga-container">
         <div className="saga-section-head">
-          <h2>Official Notice Board</h2>
-          <p>Stay informed with the latest timetables, exam alerts, and academic notices.</p>
+          <h2>Academic Notices &amp; Announcements</h2>
+          <p>Current test timetables, batch announcements, and portal updates.</p>
         </div>
 
         <div className="saga-notices-list">
@@ -44,17 +38,17 @@ export default function HomeNoticesContact() {
           ))}
         </div>
 
-        {/* Clean Admissions Hotline strip */}
+        {/* Admissions Helpline strip */}
         <div className="saga-helpline-strip">
           <div className="saga-helpline-info">
-            <strong className="saga-helpline-title">Need Academic or Enrollment Assistance?</strong>
+            <strong className="saga-helpline-title">Academic &amp; Enrollment Inquiries</strong>
             <span className="saga-helpline-desc">
-              Official Guidance Desk: <strong>{CONTACT_PHONE}</strong>
+              Guidance Desk: <strong>{CONTACT_PHONE}</strong>
             </span>
           </div>
           <a href={`tel:${CONTACT_PHONE}`} className="saga-btn saga-btn-primary saga-helpline-btn">
             <PhoneIcon size={14} />
-            <span>Call Helpline</span>
+            <span>Call {CONTACT_PHONE}</span>
           </a>
         </div>
       </div>

@@ -21,11 +21,21 @@ function ImagePreview({ src, alt }) {
 }
 
 export default function QuestionItem({ question, onDelete, isPublished }) {
+  const neg = question.negative_marks ?? 0;
+
   return (
     <li className="q-item">
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-        <p style={{ fontWeight: 600, fontSize: "1rem" }}>{question.question_text}</p>
-        <span className="badge secondary">{question.marks} {question.marks === 1 ? "mark" : "marks"}</span>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "0.75rem" }}>
+        <p style={{ fontWeight: 600, fontSize: "1rem", margin: 0 }}>{question.question_text}</p>
+        <div style={{ display: "flex", gap: "0.4rem", flexShrink: 0 }}>
+          <span className="badge secondary" style={{ color: "var(--success-text)" }}>+{question.marks}</span>
+          {neg > 0 && (
+            <span className="badge secondary" style={{ color: "var(--danger)" }}>&minus;{neg}</span>
+          )}
+          {neg === 0 && (
+            <span className="badge secondary">No penalty</span>
+          )}
+        </div>
       </div>
 
       <ImagePreview src={question.question_image_url} alt="Question figure" />

@@ -1,0 +1,519 @@
+/* Performance Analysis — theme-aware styles */
+
+/* ── Page shell ─────────────────────────────────────────────────────────────── */
+.perf-page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 4rem;
+}
+
+.perf-page h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-main);
+  margin: 0 0 0.25rem;
+}
+
+/* ── Exam selector ───────────────────────────────────────────────────────────── */
+.perf-exam-selector {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.75rem;
+  flex-wrap: wrap;
+}
+
+.perf-exam-selector label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.perf-exam-selector select {
+  flex: 1;
+  min-width: 200px;
+  max-width: 420px;
+  padding: 0.5rem 0.75rem;
+  font-family: inherit;
+  font-size: 0.9rem;
+  color: var(--text-main);
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.perf-exam-selector select:focus {
+  outline: none;
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+}
+
+/* ── Summary cards grid ──────────────────────────────────────────────────────── */
+.perf-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+.perf-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1rem 1rem 0.875rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  transition: box-shadow 0.15s;
+}
+
+.perf-card-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-subtle);
+  /* no uppercase, no tracked letters */
+}
+
+.perf-card-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--text-main);
+  font-variant-numeric: tabular-nums;
+}
+
+.perf-card-value.correct   { color: #16a34a; }
+.perf-card-value.incorrect { color: #dc2626; }
+.perf-card-value.warning   { color: #d97706; }
+.perf-card-value.info      { color: var(--primary); }
+
+[data-theme="dark"] .perf-card-value.correct   { color: #4ade80; }
+[data-theme="dark"] .perf-card-value.incorrect { color: #f87171; }
+[data-theme="dark"] .perf-card-value.warning   { color: #fbbf24; }
+[data-theme="dark"] .perf-card-value.info      { color: #60a5fa; }
+
+/* ── Charts row ──────────────────────────────────────────────────────────────── */
+.perf-charts-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+@media (max-width: 700px) {
+  .perf-charts-row { grid-template-columns: 1fr; }
+}
+
+.perf-chart-box {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+}
+
+.perf-chart-box h3 {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-subtle);
+  margin: 0 0 1rem;
+  /* sentence case, not uppercase tracked */
+}
+
+/* Recharts tooltip override — matches theme surface */
+.recharts-tooltip-wrapper .recharts-default-tooltip {
+  background: var(--bg-surface-elevated) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: var(--radius-sm) !important;
+  box-shadow: var(--shadow-md) !important;
+  color: var(--text-main) !important;
+  font-size: 0.8rem !important;
+}
+
+.recharts-tooltip-label {
+  color: var(--text-muted) !important;
+  font-weight: 600 !important;
+}
+
+/* Recharts axis text — uses theme text colour */
+.recharts-cartesian-axis-tick text,
+.recharts-legend-item-text {
+  fill: var(--text-subtle) !important;
+  font-size: 11px !important;
+}
+
+/* ── Question breakdown ───────────────────────────────────────────────────────── */
+.perf-q-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  margin-bottom: 2rem;
+}
+
+.perf-q-item {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-left: 4px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.25rem;
+  transition: box-shadow 0.15s;
+}
+
+.perf-q-item.correct {
+  border-left-color: #16a34a;
+  background: color-mix(in srgb, #16a34a 4%, var(--bg-surface));
+}
+
+.perf-q-item.incorrect {
+  border-left-color: #dc2626;
+  background: color-mix(in srgb, #dc2626 4%, var(--bg-surface));
+}
+
+.perf-q-item.unanswered {
+  border-left-color: var(--border-color);
+}
+
+[data-theme="dark"] .perf-q-item.correct {
+  border-left-color: #4ade80;
+  background: rgba(74, 222, 128, 0.04);
+}
+
+[data-theme="dark"] .perf-q-item.incorrect {
+  border-left-color: #f87171;
+  background: rgba(248, 113, 113, 0.04);
+}
+
+.perf-q-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.perf-q-num {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-subtle);
+  white-space: nowrap;
+}
+
+.perf-q-status-pill {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.perf-q-status-pill.correct {
+  background: color-mix(in srgb, #16a34a 12%, transparent);
+  color: #15803d;
+}
+
+.perf-q-status-pill.incorrect {
+  background: color-mix(in srgb, #dc2626 12%, transparent);
+  color: #b91c1c;
+}
+
+.perf-q-status-pill.unanswered {
+  background: var(--bg-surface-elevated);
+  color: var(--text-subtle);
+}
+
+[data-theme="dark"] .perf-q-status-pill.correct {
+  background: rgba(74, 222, 128, 0.14);
+  color: #4ade80;
+}
+
+[data-theme="dark"] .perf-q-status-pill.incorrect {
+  background: rgba(248, 113, 113, 0.14);
+  color: #f87171;
+}
+
+.perf-q-text {
+  font-size: 0.925rem;
+  font-weight: 500;
+  color: var(--text-main);
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+}
+
+.perf-q-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  font-size: 0.8rem;
+  color: var(--text-subtle);
+}
+
+.perf-q-meta strong { color: var(--text-muted); font-weight: 600; }
+
+/* ── Strengths / Weaknesses ──────────────────────────────────────────────────── */
+.perf-insights {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+@media (max-width: 600px) {
+  .perf-insights { grid-template-columns: 1fr; }
+}
+
+.perf-insight-box {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.25rem;
+}
+
+.perf-insight-box h3 {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-subtle);
+  margin: 0 0 0.75rem;
+}
+
+.perf-insight-box.strength { border-top: 2px solid #16a34a; }
+.perf-insight-box.weakness { border-top: 2px solid #dc2626; }
+
+[data-theme="dark"] .perf-insight-box.strength { border-top-color: #4ade80; }
+[data-theme="dark"] .perf-insight-box.weakness { border-top-color: #f87171; }
+
+.perf-insight-box ul {
+  margin: 0;
+  padding-left: 1.25rem;
+  font-size: 0.875rem;
+  line-height: 1.65;
+  color: var(--text-muted);
+}
+
+.perf-insight-box p {
+  font-size: 0.875rem;
+  color: var(--text-subtle);
+  margin: 0;
+}
+
+/* ── Trends ──────────────────────────────────────────────────────────────────── */
+.perf-trend-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+}
+
+.perf-trend-item {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 0.625rem 0.875rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.perf-trend-title {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0;
+}
+
+.perf-trend-score {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--text-main);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* ── Student performance table ───────────────────────────────────────────────── */
+.perf-student-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.perf-student-table th {
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-subtle);
+  border-bottom: 1px solid var(--border-color);
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  /* no uppercase, no letter-spacing */
+}
+
+.perf-student-table th:hover {
+  color: var(--text-muted);
+}
+
+.perf-student-table td {
+  padding: 0.65rem 0.75rem;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-main);
+}
+
+.perf-student-table tbody tr {
+  transition: background 0.1s;
+}
+
+.perf-student-table tbody tr:hover {
+  background: var(--bg-surface-elevated);
+  cursor: pointer;
+}
+
+/* ── Question difficulty table ───────────────────────────────────────────────── */
+.perf-diff-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  margin-bottom: 2rem;
+}
+
+.perf-diff-table th {
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-subtle);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.perf-diff-table td {
+  padding: 0.65rem 0.75rem;
+  border-bottom: 1px solid var(--border-color);
+  vertical-align: top;
+  color: var(--text-main);
+}
+
+.perf-diff-bar {
+  height: 5px;
+  border-radius: 3px;
+  background: var(--border-color);
+  overflow: hidden;
+  margin-top: 5px;
+  min-width: 60px;
+}
+
+.perf-diff-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.4s ease;
+}
+
+/* ── Pagination ──────────────────────────────────────────────────────────────── */
+.perf-pagination {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.perf-pagination button {
+  padding: 0.3rem 0.75rem;
+  font-size: 0.8rem;
+}
+
+/* ── Section heading ─────────────────────────────────────────────────────────── */
+.perf-section-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin: 0 0 0.75rem;
+  color: var(--text-main);
+}
+
+/* ── Back link ───────────────────────────────────────────────────────────────── */
+.perf-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-bottom: 1.25rem;
+  font-size: 0.875rem;
+  color: var(--text-subtle);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.perf-back:hover { color: var(--text-muted); text-decoration: none; }
+
+/* ── Tab switcher ────────────────────────────────────────────────────────────── */
+.perf-tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.perf-tab {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  color: var(--text-subtle);
+  margin-bottom: -1px;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.perf-tab:hover {
+  color: var(--text-muted);
+}
+
+.perf-tab.active {
+  color: var(--text-main);
+  border-bottom-color: var(--primary);
+  font-weight: 600;
+}
+
+/* ── Empty / loading ─────────────────────────────────────────────────────────── */
+.perf-empty {
+  text-align: center;
+  color: var(--text-subtle);
+  padding: 3rem 1rem;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+/* ── Search row ──────────────────────────────────────────────────────────────── */
+.perf-search-row {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.perf-search-row input {
+  flex: 1;
+  min-width: 200px;
+  padding: 0.5rem 0.75rem;
+  font-family: inherit;
+  font-size: 0.9rem;
+  color: var(--text-main);
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: var(--radius-sm);
+  transition: border-color 0.15s;
+}
+
+.perf-search-row input:focus {
+  outline: none;
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+}

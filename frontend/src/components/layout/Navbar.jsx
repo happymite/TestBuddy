@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router";
-import { useAuth } from "../context/AuthContext.jsx";
-import SagaCityLogo from "./SagaCityLogo.jsx";
+import { useAuth } from "../../context/AuthContext.jsx";
+import SagaCityLogo from "../common/SagaCityLogo.jsx";
 import { NAV_FLOW, CONTACT_PHONE } from "./navData.js";
-import { PhoneIcon } from "./Icons.jsx";
-import "../styles/navbar.css";
+import { PhoneIcon } from "../common/Icons.jsx";
+import "../../styles/navbar.css";
 
 export default function Navbar() {
   const { user, logout } = useAuth();

@@ -22,20 +22,15 @@ export default function ExamResult() {
         } catch (err) {
           if (err.status !== 409) throw err;
 
-          // 409 = "not submitted yet". Find out why before doing anything.
           const info = await getAttempt(attemptId);
           const att = info.attempt;
 
           if (att.status === "in_progress" && !att.is_expired) {
-            // Still running: this is NOT a result page yet. Go back.
-            if (!cancelled) {
-              navigate(`/attempts/${attemptId}/take`, { replace: true });
-            }
+            if (!cancelled) navigate(`/attempts/${attemptId}/take`, { replace: true });
             return;
           }
 
           if (att.status === "in_progress") {
-            // Time ran out and nobody submitted: finalize it now.
             try {
               await submitAttempt(attemptId);
             } catch (e) {
@@ -53,23 +48,14 @@ export default function ExamResult() {
     }
 
     load();
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, [attemptId, reloadKey, navigate]);
 
   if (error) {
     return (
-      <div>
-        <p className="error" role="alert">
-          {error}
-        </p>
-        <button
-          onClick={() => {
-            setError("");
-            setReloadKey((key) => key + 1);
-          }}
-        >
+      <div className="result-card">
+        <p className="error" role="alert">{error}</p>
+        <button onClick={() => { setError(""); setReloadKey((k) => k + 1); }}>
           Try again
         </button>{" "}
         <Link to="/dashboard">Back to dashboard</Link>
@@ -77,7 +63,7 @@ export default function ExamResult() {
     );
   }
 
-  if (!result) return <p>Loading your result...</p>;
+  if (!result) return <div className="result-card"><p>Loading your result...</p></div>;
 
   const auto = result.auto_submitted ?? state?.result?.auto_submitted;
   const percent =
@@ -85,20 +71,37 @@ export default function ExamResult() {
       ? Math.round((result.score / result.total_marks) * 100)
       : 0;
 
+  const scoreColor =
+    percent >= 70 ? "var(--color-success, #22c55e)"
+    : percent >= 40 ? "var(--color-warn, #eab308)"
+    : "var(--color-danger, #ef4444)";
+
   return (
     <div className="result-card">
-      <h1>Exam submitted</h1>
-      <p className="score">
-        {result.score} / {result.total_marks}
-      </p>
-      <p>{percent}%</p>
-      <p>Submitted: {new Date(result.submitted_at).toLocaleString()}</p>
       {auto && (
-        <p className="banner">
-          This exam was submitted automatically because time ran out.
+        <p className="banner" role="status">
+          Time ran out. This exam was submitted automatically.
         </p>
       )}
-      <Link to="/dashboard">Back to dashboard</Link>
+
+      <h1>Exam submitted</h1>
+
+      <div className="result-score-block" style={{ textAlign: "center", margin: "1.5rem 0" }}>
+        <p className="score" style={{ color: scoreColor }}>
+          {result.score} <span style={{ opacity: 0.5, fontSize: "0.6em" }}>/ {result.total_marks}</span>
+        </p>
+        <p style={{ fontSize: "1.25rem", fontWeight: 600, color: scoreColor }}>{percent}%</p>
+      </div>
+
+      <ul className="exam-meta" style={{ marginBottom: "1.5rem" }}>
+        <li>Submitted: {new Date(result.submitted_at).toLocaleString()}</li>
+        {result.auto_submitted && <li>Auto-submitted when timer expired</li>}
+      </ul>
+
+      <div style={{ display: "flex", gap: "0.75rem", justifyContent: "center", flexWrap: "wrap" }}>
+        <Link to="/performance" className="button-link">Performance Analysis</Link>
+        <Link to="/dashboard" className="button-link secondary">Back to dashboard</Link>
+      </div>
     </div>
   );
 }

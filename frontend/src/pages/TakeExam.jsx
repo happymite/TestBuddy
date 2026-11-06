@@ -2,10 +2,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { getAttempt, saveAnswer, submitAttempt } from "../api/attempt.js";
 import { getQuestions } from "../api/exam.js";
-import QuestionCard from "../components/QuestionCard.jsx";
+import QuestionCard from "../components/exam/QuestionCard.jsx";
 import ExamTimerBar from "../components/exam/ExamTimerBar.jsx";
 import ExamNavigator from "../components/exam/ExamNavigator.jsx";
-import { secondsRemaining } from "../components/exam/guestSessionStorage.js";
+import { secondsRemaining } from "../utils/guestSessionStorage.js";
 
 export default function TakeExam() {
   const { attemptId } = useParams();

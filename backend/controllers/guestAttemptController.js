@@ -55,7 +55,10 @@ export async function saveGuestAnswer(req, res) {
       return res.status(409).json({ success: false, code: "ATTEMPT_ALREADY_ENDED", message: "Not in progress." });
     }
 
-    const expiry = await client.query(`SELECT expires_at <= NOW() AS expired FROM public.exam_attempts WHERE id = $1`, [attemptId]);
+    const expiry = await client.query(
+      `SELECT expires_at <= NOW() AS expired FROM public.exam_attempts WHERE id = $1`,
+      [attemptId],
+    );
     if (expiry.rows[0].expired) {
       await gradeAttempt(client, attemptId, attempt.exam_id, true);
       await client.query("COMMIT");
@@ -104,9 +107,14 @@ export async function submitGuestAttempt(req, res) {
       return res.status(409).json({ success: false, code: "ATTEMPT_ALREADY_ENDED", message: "Already ended." });
     }
 
-    const expiry = await client.query(`SELECT expires_at <= NOW() AS expired FROM public.exam_attempts WHERE id = $1`, [attemptId]);
+    const expiry = await client.query(
+      `SELECT expires_at <= NOW() AS expired FROM public.exam_attempts WHERE id = $1`,
+      [attemptId],
+    );
     const autoSubmitted = expiry.rows[0].expired;
-    const result = await gradeAttempt(client, attemptId, attempt.exam_id, autoSubmitted);
+
+    // gradeAttempt now returns breakdown (per-question) BEFORE deleting answer rows
+    const graded = await gradeAttempt(client, attemptId, attempt.exam_id, autoSubmitted);
     await client.query("COMMIT");
 
     return res.status(200).json({
@@ -114,9 +122,14 @@ export async function submitGuestAttempt(req, res) {
       message: autoSubmitted ? "Time expired." : "Attempt submitted.",
       result: {
         attempt_id: attemptId,
-        score: Number(result.score),
-        total_marks: Number(result.total_marks),
-        auto_submitted: result.auto_submitted,
+        exam_id: attempt.exam_id,
+        score: Number(graded.score),
+        total_marks: Number(graded.total_marks),
+        auto_submitted: graded.auto_submitted,
+        // breakdown is an array of { question_id, question_text, selected_option,
+        //   correct_option, is_correct, marks_awarded, marks }
+        // null for registered students (their rows are kept for teacher reports)
+        breakdown: graded.breakdown,
       },
     });
   } catch (error) {
