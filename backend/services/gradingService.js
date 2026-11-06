@@ -18,19 +18,17 @@ export async function gradeAttempt(client, attemptId, examId, auto) {
     [attemptId],
   );
 
-  // P2 FIX: Floor score at 0 using GREATEST(0, ...).
-  // Without this, heavy negative marking could produce a negative total score,
-  // which may crash with a PostgreSQL CHECK constraint violation (error 23514).
+  // Allow negative scores: total score is the sum of marks awarded (which includes negative penalties).
   const result = await client.query(
     `UPDATE public.exam_attempts
      SET status = 'submitted',
          submitted_at = LEAST(NOW(), expires_at),
          auto_submitted = $3,
-         score = GREATEST(0, (
+         score = (
            SELECT COALESCE(SUM(marks_awarded), 0)
            FROM public.exam_answers
            WHERE attempt_id = $1
-         )),
+         ),
          total_marks = (
            SELECT COALESCE(SUM(marks), 0)
            FROM public.questions
