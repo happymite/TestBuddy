@@ -41,9 +41,6 @@ export default function AdminLayout() {
             >
               Performance Analysis
             </NavLink>
-            <Link to="/admin/exams/new" className="button-link admin-nav-btn" style={{ fontWeight: 700 }}>
-              + New Test
-            </Link>
           </nav>
 
           <div className="admin-nav-right">
