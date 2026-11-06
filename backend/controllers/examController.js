@@ -134,6 +134,20 @@ export async function deleteExam(req, res) {
       return res.status(404).json({ success: false, message: "Exam not found or unauthorized." });
     }
 
+    // P1 FIX: Block deletion if students have submitted attempts — preserve academic records.
+    // Teachers must unpublish the exam to hide it from students instead.
+    const submittedCheck = await client.query(
+      `SELECT COUNT(*)::int AS count FROM public.exam_attempts WHERE exam_id = $1 AND status = 'submitted'`,
+      [examId],
+    );
+    if (submittedCheck.rows[0].count > 0) {
+      await client.query("ROLLBACK");
+      return res.status(409).json({
+        success: false,
+        message: "Cannot delete an exam with submitted student attempts. Unpublish it instead to hide it from students.",
+      });
+    }
+
     await client.query(`DELETE FROM public.exam_answers WHERE attempt_id IN (SELECT id FROM public.exam_attempts WHERE exam_id = $1)`, [examId]);
     await client.query(`DELETE FROM public.exam_attempts WHERE exam_id = $1`, [examId]);
 

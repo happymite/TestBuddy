@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router";
 import { getGuestAttempt, getGuestQuestions, saveGuestAnswer, submitGuestAttempt } from "../api/guest.js";
-import { readCredential, storeResult, secondsRemaining } from "../utils/guestSessionStorage.js";
+import { readCredential, readResult, storeResult, secondsRemaining } from "../utils/guestSessionStorage.js";
 import QuestionCard from "../components/exam/QuestionCard.jsx";
 import ExamTimerBar from "../components/exam/ExamTimerBar.jsx";
 import ExamNavigator from "../components/exam/ExamNavigator.jsx";
@@ -47,13 +47,32 @@ export default function GuestTakeExam() {
       setPhase("error");
       return;
     }
+
+    // P1 FIX: Check sessionStorage for a cached result first.
+    // This restores the result screen if the guest refreshes after submission
+    // without needing another network request.
+    const cachedResult = readResult(attemptId);
+    if (cachedResult) {
+      setResult(cachedResult);
+      setPhase("done");
+      return;
+    }
+
     let cancelled = false;
     Promise.all([getGuestAttempt(attemptId, credential), getGuestQuestions(attemptId, credential)])
       .then(([attData, qData]) => {
         if (cancelled) return;
         const att = attData.attempt;
-        const qs = qData.questions || [];
         setAttempt(att);
+
+        // If attempt is already submitted (e.g. auto-submitted during session loss),
+        // transition to done phase rather than re-rendering the exam UI with no questions.
+        if (att.status === "submitted") {
+          setPhase("done");
+          return;
+        }
+
+        const qs = qData.questions || [];
         setQuestions(qs);
         const expiresMs = att.expires_at ? new Date(att.expires_at).getTime() : null;
         setSecondsLeft(expiresMs ? secondsRemaining(expiresMs, 0) : (att.duration_minutes || 60) * 60);
@@ -104,6 +123,15 @@ export default function GuestTakeExam() {
   );
   if (phase === "done" && result) {
     return <GuestResultView result={result} examId={attempt?.exam_id} />;
+  }
+  // Submitted but no cached result (auto-submitted with no breakdown) — show minimal done state
+  if (phase === "done") {
+    return (
+      <div className="page">
+        <p>Your exam has been submitted. Thank you for participating!</p>
+        <Link to="/examinations" className="button-link secondary">← Back to Examinations</Link>
+      </div>
+    );
   }
 
   const q = questions[index];

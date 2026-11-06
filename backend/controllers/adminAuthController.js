@@ -32,15 +32,11 @@ export async function adminLogin(req, res) {
     const user = result.rows[0];
     const match = await bcrypt.compare(password, user ? user.password_hash : DUMMY_HASH);
 
-    if (!user || !match) {
+    // P0 FIX: Merged into single condition — eliminates credential oracle.
+    // Before: valid student password returned 403, confirming the password was correct.
+    // Now: any failure (wrong email, wrong password, or not admin) → uniform 401.
+    if (!user || !match || user.role !== "admin") {
       return res.status(401).json({ success: false, message: "Invalid admin email or password." });
-    }
-
-    if (user.role !== "admin") {
-      return res.status(403).json({
-        success: false,
-        message: "Access denied. Only system administrators can access this portal.",
-      });
     }
 
     return res.status(200).json({
@@ -70,4 +66,3 @@ export async function adminMe(req, res) {
     return res.status(500).json({ success: false, message: "Error retrieving admin profile." });
   }
 }
-

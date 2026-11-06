@@ -1,8 +1,12 @@
-const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
+// P2 FIX: Strip trailing slash so VITE_API_URL with trailing "/" doesn't produce
+// double-slash URLs like "https://api.example.com//api/admin/exams".
+const BASE_URL = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(/\/+$/, "");
 const ADMIN_TOKEN_KEY = "testbuddy_admin_token";
 
 export function getAdminToken() {
-  return localStorage.getItem(ADMIN_TOKEN_KEY) || localStorage.getItem("testbuddy_token");
+  // P2 FIX: No fallback to student token — prevents cross-portal token leakage.
+  return localStorage.getItem(ADMIN_TOKEN_KEY);
 }
 
 export function setAdminToken(token) {

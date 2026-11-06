@@ -89,6 +89,9 @@ export async function request(
           window.location.pathname.startsWith("/teacher"))
       ) {
         localStorage.removeItem(ADMIN_TOKEN_KEY);
+        // P2 FIX: Call onUnauthorized for admin paths too — previously missing,
+        // which left admins stuck on a broken page instead of being redirected to login.
+        onUnauthorized?.();
       } else {
         clearToken();
         onUnauthorized?.();

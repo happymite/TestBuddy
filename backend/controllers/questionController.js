@@ -88,13 +88,23 @@ export async function deleteQuestion(req, res) {
     client = await pool.connect();
     await client.query("BEGIN");
 
+    // P1 FIX: Fetch is_published to block destructive deletion on live exams.
     const check = await client.query(
-      `SELECT id FROM public.exams WHERE id = $1 AND ($2 = true OR created_by = $3) FOR UPDATE`,
+      `SELECT id, is_published FROM public.exams WHERE id = $1 AND ($2 = true OR created_by = $3) FOR UPDATE`,
       [examId, req.user?.role === "admin", req.user.id],
     );
     if (check.rows.length === 0) {
       await client.query("ROLLBACK");
       return res.status(404).json({ success: false, message: "Exam not found or unauthorized." });
+    }
+
+    // Block deletion on published exams — would destroy historical student answers.
+    if (check.rows[0].is_published) {
+      await client.query("ROLLBACK");
+      return res.status(409).json({
+        success: false,
+        message: "Cannot delete questions from a published exam. Unpublish the exam first.",
+      });
     }
 
     await client.query(`DELETE FROM public.exam_answers WHERE question_id = $1`, [questionId]);
