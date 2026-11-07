@@ -1,46 +1,68 @@
 import nodemailer from "nodemailer";
 
-// Universal email service supporting:
-// 1. Brevo HTTPS API (Recommended for Render free tier — no SMTP port blocks, no domain needed)
-// 2. Standard SMTP / Gmail (via Nodemailer)
+// Universal Email Service
+// Primary: Brevo HTTPS REST API (Port 443 — works seamlessly on Render Free Tier)
+// Fallback: Standard SMTP / Nodemailer (for local development)
+
+function parseSender(raw) {
+  if (!raw) return { name: "SAGA CITY", email: "" };
+  const match = raw.match(/^(?:(.*)<)?([^>]+)>?$/);
+  if (match) {
+    const name = match[1]?.trim() || "SAGA CITY";
+    const email = match[2]?.trim() || "";
+    return { name, email };
+  }
+  return { name: "SAGA CITY", email: raw.trim() };
+}
 
 async function sendViaBrevoApi({ to, subject, html, text }) {
   const apiKey = process.env.BREVO_API_KEY?.trim();
-  const senderEmail = (
-    process.env.BREVO_SENDER_EMAIL || process.env.SMTP_USER
-  )?.trim();
-  const senderName = process.env.BREVO_SENDER_NAME || "SAGA CITY";
+  const rawSender =
+    process.env.EMAIL_FROM ||
+    process.env.BREVO_SENDER_EMAIL ||
+    process.env.SMTP_FROM ||
+    process.env.SMTP_USER;
 
-  if (!apiKey || !senderEmail) {
+  const sender = parseSender(rawSender);
+
+  if (!apiKey || !sender.email) {
     throw new Error(
-      "Brevo not configured. Set BREVO_API_KEY and BREVO_SENDER_EMAIL in environment."
+      "Brevo not configured. Set BREVO_API_KEY and EMAIL_FROM (or BREVO_SENDER_EMAIL) in environment."
     );
   }
 
-  const response = await fetch("https://api.brevo.com/v3/smtp/email", {
-    method: "POST",
-    headers: {
-      accept: "application/json",
-      "api-key": apiKey,
-      "content-type": "application/json",
-    },
-    body: JSON.stringify({
-      sender: { name: senderName, email: senderEmail },
-      to: [{ email: to }],
-      subject,
-      htmlContent: html,
-      textContent: text,
-    }),
-  });
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 10000); // 10s timeout
 
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(
-      errorData.message || `Brevo API failed with status ${response.status}`
-    );
+  try {
+    const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+      method: "POST",
+      headers: {
+        accept: "application/json",
+        "api-key": apiKey,
+        "content-type": "application/json",
+      },
+      signal: controller.signal,
+      body: JSON.stringify({
+        sender: { name: sender.name, email: sender.email },
+        to: [{ email: to }],
+        subject,
+        htmlContent: html,
+        textContent: text,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(
+        errorData.message || `Brevo API rejected request with status ${response.status}`
+      );
+    }
+
+    return await response.json();
+  } finally {
+    clearTimeout(timer);
   }
-
-  return response.json();
 }
 
 function createTransport() {
@@ -90,7 +112,7 @@ export async function sendVerificationEmail(to, rawToken) {
   const link = `${frontendUrl}/verify-email?token=${rawToken}`;
 
   const html = `
-    <div style="font-family:sans-serif;max-width:480px;margin:auto;padding:20px;border:1px solid #e5e7eb;border-radius:8px">
+    <div style="font-family:sans-serif;max-width:480px;margin:auto;padding:24px;border:1px solid #e5e7eb;border-radius:8px">
       <h2 style="color:#111827;margin-top:0">Welcome to SAGA CITY</h2>
       <p style="color:#374151;font-size:15px;line-height:1.5">
         Please confirm your email address to activate your student account.
@@ -114,7 +136,7 @@ export async function sendVerificationEmail(to, rawToken) {
 
   const text = `Welcome to SAGA CITY\n\nPlease confirm your email address by opening the following link:\n${link}\n\nThis link will expire in 30 minutes.\nIf you did not register, please ignore this email.`;
 
-  // 1. If Brevo API key is configured, send via Brevo HTTPS REST API (Port 443 — works on Render Free Tier)
+  // 1. If Brevo API key is present, use Brevo HTTPS REST API (Port 443 — works on Render)
   if (process.env.BREVO_API_KEY) {
     return sendViaBrevoApi({
       to,
@@ -124,9 +146,10 @@ export async function sendVerificationEmail(to, rawToken) {
     });
   }
 
-  // 2. Fall back to standard SMTP / Nodemailer
+  // 2. Otherwise fall back to SMTP
   const transport = createTransport();
-  const from = process.env.SMTP_FROM || process.env.SMTP_USER;
+  const from =
+    process.env.EMAIL_FROM || process.env.SMTP_FROM || process.env.SMTP_USER;
   await transport.sendMail({
     from,
     to,
