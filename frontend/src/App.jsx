@@ -1,5 +1,6 @@
 import { lazy, Suspense } from "react";
 import { Routes, Route, Navigate } from "react-router";
+import { Analytics } from "@vercel/analytics/react";
 import ProtectedRoute from "./components/common/ProtectedRoute.jsx";
 import AdminProtectedRoute from "./components/common/AdminProtectedRoute.jsx";
 import Layout from "./components/layout/Layout.jsx";
@@ -32,6 +33,7 @@ const AdminStudentDetail = lazy(() => import("./pages/admin/AdminStudentDetail.j
 export default function App() {
   return (
     <ErrorBoundary>
+      <Analytics />
       <Suspense fallback={<PageLoader />}>
         <Routes>
           {/* Public Authentication Routes */}
