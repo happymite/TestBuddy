@@ -92,6 +92,19 @@ CLOUDINARY_API_SECRET=your_api_secret
 
 ---
 
+## 🔑 Google OAuth 2.0 Integration
+
+One-click sign-in and sign-up for students powered by Google Identity Services:
+- Verified student account provisioning in PostgreSQL with `email_verified=true`.
+- Issues standard TestBuddy session JWT (`testbuddy_token`).
+- Fully decoupled: strictly isolated to student portal (`/login` & `/register`).
+
+Configure your Google OAuth Client ID:
+- **`backend/.env`**: `GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com`
+- **`frontend/.env`**: `VITE_GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com`
+
+---
+
 ## 🚀 Quick Start Guide
 
 ### Prerequisites

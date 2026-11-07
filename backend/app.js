@@ -63,6 +63,7 @@ app.get("/api/health", (req, res) => {
 
 // Apply rate limiters before the route groups they protect.
 app.use("/api/auth/login", authLimiter);
+app.use("/api/auth/google", authLimiter);
 app.use("/api/admin/login", authLimiter);
 
 app.use("/api/auth", authRoutes);

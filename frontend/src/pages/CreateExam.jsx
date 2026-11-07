@@ -20,19 +20,15 @@ export default function CreateExam() {
   const [maxAttempts, setMaxAttempts] = useState("1");
 
   useEffect(() => {
-    getMySubjects()
-      .then((data) => setSubjects(data.subjects || []))
-      .catch(() => {});
+    getMySubjects().then((d) => setSubjects(d.subjects || [])).catch(() => {});
   }, []);
 
   function validate() {
-    const cleanTitle = title.trim();
-    if (!cleanTitle || cleanTitle.length > 200) {
-      return "Title is required and must be 200 characters or fewer.";
-    }
-    const minutes = Number(duration);
-    if (!Number.isInteger(minutes) || minutes < 1 || minutes > 180) {
-      return "Duration must be a whole number between 1 and 180 minutes.";
+    const clean = title.trim();
+    if (!clean || clean.length > 200) return "Title is required (max 200 chars).";
+    const mins = Number(duration);
+    if (!Number.isInteger(mins) || mins < 1 || mins > 180) {
+      return "Duration must be between 1 and 180 minutes.";
     }
     if (startsAt && endsAt && new Date(endsAt) <= new Date(startsAt)) {
       return "End time must be after the start time.";
@@ -43,10 +39,7 @@ export default function CreateExam() {
   async function handleSubmit(event) {
     event.preventDefault();
     const problem = validate();
-    if (problem) {
-      setError(problem);
-      return;
-    }
+    if (problem) return setError(problem);
 
     setError("");
     setSubmitting(true);
@@ -63,8 +56,8 @@ export default function CreateExam() {
         default_marks: Number(defaultMarks),
         default_negative_marks: Number(defaultNeg),
       });
-      const query = `?defaultMarks=${defaultMarks}&defaultNeg=${defaultNeg}`;
-      navigate(`/admin/exams/${data.exam.id}${query}`, { replace: true });
+      const q = `?defaultMarks=${defaultMarks}&defaultNeg=${defaultNeg}`;
+      navigate(`/admin/exams/${data.exam.id}${q}`, { replace: true });
     } catch (err) {
       setError(err.message);
       setSubmitting(false);
@@ -73,142 +66,62 @@ export default function CreateExam() {
 
   return (
     <div>
-      <p>
-        <Link to="/admin">&larr; Back to Admin Dashboard</Link>
-      </p>
+      <p><Link to="/admin">&larr; Back to Admin Dashboard</Link></p>
       <h1>Create New Assessment</h1>
-
       <form className="form-card" onSubmit={handleSubmit}>
         <div className="field">
           <label htmlFor="title">Title</label>
-          <input
-            id="title"
-            type="text"
-            required
-            maxLength={200}
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-          />
+          <input id="title" type="text" required value={title} onChange={(e) => setTitle(e.target.value)} />
         </div>
-
-        <div className="field">
-          <label htmlFor="description">Description (optional)</label>
-          <textarea
-            id="description"
-            rows={3}
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-          />
-        </div>
-
         <div className="field">
           <label htmlFor="subjectId">Subject Category</label>
-          <select
-            id="subjectId"
-            value={subjectId}
-            onChange={(e) => setSubjectId(e.target.value)}
-          >
-            <option value="">— No subject / Uncategorised —</option>
-            {subjects.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.name}
-              </option>
-            ))}
+          <select id="subjectId" value={subjectId} onChange={(e) => setSubjectId(e.target.value)}>
+            <option value="">— Select a Subject —</option>
+            {subjects.map((s) => (<option key={s.id} value={s.id}>{s.name}</option>))}
           </select>
         </div>
-
+        <div className="field">
+          <label htmlFor="description">Description (optional)</label>
+          <textarea id="description" rows={3} value={description} onChange={(e) => setDescription(e.target.value)} />
+        </div>
         <div className="field">
           <label htmlFor="accessMode">Exam Access Mode</label>
-          <select
-            id="accessMode"
-            value={accessMode}
-            onChange={(e) => setAccessMode(e.target.value)}
-          >
+          <select id="accessMode" value={accessMode} onChange={(e) => setAccessMode(e.target.value)}>
             <option value="graded">Graded — students must sign in</option>
             <option value="practice">Practice — guests can take test</option>
           </select>
         </div>
-
         <div className="field">
           <label htmlFor="duration">Duration (minutes)</label>
-          <input
-            id="duration"
-            type="number"
-            min="1"
-            max="180"
-            step="1"
-            required
-            value={duration}
-            onChange={(e) => setDuration(e.target.value)}
-          />
+          <input id="duration" type="number" min="1" max="180" step="1" required value={duration} onChange={(e) => setDuration(e.target.value)} />
         </div>
         <div className="field-row">
           <div className="field">
             <label htmlFor="defaultMarks">Marks per correct answer</label>
-            <input
-              id="defaultMarks"
-              type="number"
-              min="1"
-              step="1"
-              required
-              value={defaultMarks}
-              onChange={(e) => setDefaultMarks(e.target.value)}
-            />
+            <input id="defaultMarks" type="number" min="1" step="1" required value={defaultMarks} onChange={(e) => setDefaultMarks(e.target.value)} />
           </div>
           <div className="field">
             <label htmlFor="defaultNegativeMarks">Marks deducted per wrong answer</label>
-            <input
-              id="defaultNegativeMarks"
-              type="number"
-              min="0"
-              step="1"
-              required
-              value={defaultNeg}
-              onChange={(e) => setDefaultNeg(e.target.value)}
-            />
+            <input id="defaultNegativeMarks" type="number" min="0" step="1" required value={defaultNeg} onChange={(e) => setDefaultNeg(e.target.value)} />
           </div>
         </div>
-
         <div className="field">
           <label htmlFor="maxAttempts">Attempts allowed per student</label>
-          <select
-            id="maxAttempts"
-            value={maxAttempts}
-            onChange={(e) => setMaxAttempts(e.target.value)}
-          >
-            {[1, 2, 3, 4, 5].map((n) => (
-              <option key={n} value={n}>{n}</option>
-            ))}
+          <select id="maxAttempts" value={maxAttempts} onChange={(e) => setMaxAttempts(e.target.value)}>
+            {[1, 2, 3, 4, 5].map((n) => (<option key={n} value={n}>{n}</option>))}
           </select>
         </div>
-
         <div className="field-row">
           <div className="field">
             <label htmlFor="startsAt">Opens at (optional)</label>
-            <input
-              id="startsAt"
-              type="datetime-local"
-              value={startsAt}
-              onChange={(e) => setStartsAt(e.target.value)}
-            />
+            <input id="startsAt" type="datetime-local" value={startsAt} onChange={(e) => setStartsAt(e.target.value)} />
           </div>
           <div className="field">
             <label htmlFor="endsAt">Closes at (optional)</label>
-            <input
-              id="endsAt"
-              type="datetime-local"
-              value={endsAt}
-              onChange={(e) => setEndsAt(e.target.value)}
-            />
+            <input id="endsAt" type="datetime-local" value={endsAt} onChange={(e) => setEndsAt(e.target.value)} />
           </div>
         </div>
-
-        {error && (
-          <p className="error" role="alert">
-            {error}
-          </p>
-        )}
-
+        {error && <p className="error" role="alert">{error}</p>}
         <button type="submit" disabled={submitting}>
           {submitting ? "Creating..." : "Create exam and add questions"}
         </button>

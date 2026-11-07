@@ -11,12 +11,9 @@ const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
-  // If a token exists, we must ask the server who it belongs to before
-  // deciding anything. Until then we are "loading".
   const [loading, setLoading] = useState(Boolean(getToken()));
   const [sessionExpired, setSessionExpired] = useState(false);
 
-  // Tell the API client what to do when the server says "401".
   useEffect(() => {
     setUnauthorizedHandler(() => {
       setUser(null);
@@ -24,7 +21,6 @@ export function AuthProvider({ children }) {
     });
   }, []);
 
-  // On page load/refresh: if we have a token, restore the user from the server.
   useEffect(() => {
     if (!getToken()) return;
 
@@ -34,10 +30,7 @@ export function AuthProvider({ children }) {
       .then((data) => {
         if (!cancelled) setUser(data.user);
       })
-      .catch(() => {
-        // 401s are handled by the client (token cleared, handler called).
-        // Other errors (server down): user stays null and sees the login page.
-      })
+      .catch(() => {})
       .finally(() => {
         if (!cancelled) setLoading(false);
       });
@@ -52,6 +45,14 @@ export function AuthProvider({ children }) {
     setToken(data.token);
     setUser(data.user);
     setSessionExpired(false);
+  }
+
+  async function googleLogin(credential) {
+    const data = await authApi.loginWithGoogle(credential);
+    setToken(data.token);
+    setUser(data.user);
+    setSessionExpired(false);
+    return data;
   }
 
   async function register(name, email, password) {
@@ -69,7 +70,15 @@ export function AuthProvider({ children }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, loading, sessionExpired, login, register, logout }}
+      value={{
+        user,
+        loading,
+        sessionExpired,
+        login,
+        googleLogin,
+        register,
+        logout,
+      }}
     >
       {children}
     </AuthContext.Provider>

@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { Link, Navigate } from "react-router";
 import { useAuth } from "../context/AuthContext.jsx";
+import GoogleAuthButton from "../components/common/GoogleAuthButton.jsx";
 
 export default function Login() {
-  const { user, loading, login, sessionExpired } = useAuth();
+  const { user, loading, login, googleLogin, sessionExpired } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -24,43 +25,26 @@ export default function Login() {
     }
   }
 
+  async function handleGoogleCredential(credential) {
+    setError("");
+    await googleLogin(credential);
+  }
+
   return (
-    <div className="auth-card">
-      <h1>Student Login</h1>
-      <p className="hint" style={{ marginBottom: "1rem" }}>
-        Sign in to take assessments and view your scores
-      </p>
-
-      {sessionExpired && (
-        <p className="error" role="alert">
-          Your session expired. Please log in again.
-        </p>
-      )}
-
-      <form onSubmit={handleSubmit}>
-        <div className="field">
-          <label htmlFor="email">Email address</label>
-          <input
-            id="email"
-            type="email"
-            autoComplete="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
+    <div className="auth-container">
+      <div className="auth-card">
+        <div className="auth-header">
+          <h1>Student Login</h1>
+          <p className="hint">
+            Sign in to take assessments and track your performance
+          </p>
         </div>
 
-        <div className="field">
-          <label htmlFor="password">Password</label>
-          <input
-            id="password"
-            type="password"
-            autoComplete="current-password"
-            required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </div>
+        {sessionExpired && (
+          <p className="error" role="alert">
+            Your session expired. Please log in again.
+          </p>
+        )}
 
         {error && (
           <p className="error" role="alert">
@@ -68,17 +52,55 @@ export default function Login() {
           </p>
         )}
 
-        <button type="submit" disabled={submitting}>
-          {submitting ? "Signing in..." : "Log in"}
-        </button>
-      </form>
+        <form onSubmit={handleSubmit}>
+          <div className="field">
+            <label htmlFor="email">Email address</label>
+            <input
+              id="email"
+              type="email"
+              autoComplete="email"
+              required
+              placeholder="candidate@student.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
 
-      <p className="auth-footer">
-        Do not have a student account? <Link to="/register">Register here</Link>
-      </p>
-      <p className="auth-footer" style={{ marginTop: "0.5rem", fontSize: "0.85rem" }}>
-        Administrator? <Link to="/admin/login">Admin Console &rarr;</Link>
-      </p>
+          <div className="field">
+            <label htmlFor="password">Password</label>
+            <input
+              id="password"
+              type="password"
+              autoComplete="current-password"
+              required
+              placeholder="Enter your password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="auth-submit-btn"
+            disabled={submitting}
+          >
+            {submitting ? "Signing in..." : "Log in"}
+          </button>
+        </form>
+
+        <GoogleAuthButton
+          onCredential={handleGoogleCredential}
+          onError={(msg) => setError(msg)}
+          text="signin_with"
+        />
+
+        <p className="auth-footer">
+          Do not have a student account? <Link to="/register">Register here</Link>
+        </p>
+        <p className="auth-footer" style={{ marginTop: "0.4rem", fontSize: "0.85rem" }}>
+          Administrator? <Link to="/admin/login">Admin Console &rarr;</Link>
+        </p>
+      </div>
     </div>
   );
 }

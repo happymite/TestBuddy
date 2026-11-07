@@ -2,9 +2,10 @@ import { useState } from "react";
 import { Link, Navigate } from "react-router";
 import { useAuth } from "../context/AuthContext.jsx";
 import { homePathFor } from "../utils/homePath.js";
+import GoogleAuthButton from "../components/common/GoogleAuthButton.jsx";
 
 export default function Register() {
-  const { user, loading, register } = useAuth();
+  const { user, loading, register, googleLogin } = useAuth();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -23,7 +24,6 @@ export default function Register() {
     if (password.length < 8) {
       return "Password must be at least 8 characters.";
     }
-    // bcrypt only uses the first 72 BYTES. Emoji/accents take more than 1 byte.
     if (new TextEncoder().encode(password).length > 72) {
       return "Password is too long (maximum 72 bytes).";
     }
@@ -46,62 +46,24 @@ export default function Register() {
     try {
       await register(name.trim(), email.trim(), password);
     } catch (err) {
-      setError(err.message); // e.g. "An account with this email already exists."
+      setError(err.message);
       setSubmitting(false);
     }
   }
 
+  async function handleGoogleCredential(credential) {
+    setError("");
+    await googleLogin(credential);
+  }
+
   return (
-    <div className="auth-card">
-      <h1>Create your account</h1>
-
-      <form onSubmit={handleSubmit}>
-        <div className="field">
-          <label htmlFor="name">Name</label>
-          <input
-            id="name"
-            type="text"
-            autoComplete="name"
-            required
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-        </div>
-
-        <div className="field">
-          <label htmlFor="email">Email</label>
-          <input
-            id="email"
-            type="email"
-            autoComplete="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </div>
-
-        <div className="field">
-          <label htmlFor="password">Password</label>
-          <input
-            id="password"
-            type="password"
-            autoComplete="new-password"
-            required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </div>
-
-        <div className="field">
-          <label htmlFor="confirm">Confirm password</label>
-          <input
-            id="confirm"
-            type="password"
-            autoComplete="new-password"
-            required
-            value={confirm}
-            onChange={(e) => setConfirm(e.target.value)}
-          />
+    <div className="auth-container">
+      <div className="auth-card">
+        <div className="auth-header">
+          <h1>Create your account</h1>
+          <p className="hint">
+            Join SAGA CITY to access study materials and assessments
+          </p>
         </div>
 
         {error && (
@@ -110,14 +72,78 @@ export default function Register() {
           </p>
         )}
 
-        <button type="submit" disabled={submitting}>
-          {submitting ? "Creating account..." : "Register"}
-        </button>
-      </form>
+        <form onSubmit={handleSubmit}>
+          <div className="field">
+            <label htmlFor="name">Name</label>
+            <input
+              id="name"
+              type="text"
+              autoComplete="name"
+              required
+              placeholder="Candidate Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+          </div>
 
-      <p>
-        Already registered? <Link to="/login">Log in</Link>
-      </p>
+          <div className="field">
+            <label htmlFor="email">Email</label>
+            <input
+              id="email"
+              type="email"
+              autoComplete="email"
+              required
+              placeholder="candidate@student.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+
+          <div className="field">
+            <label htmlFor="password">Password</label>
+            <input
+              id="password"
+              type="password"
+              autoComplete="new-password"
+              required
+              placeholder="At least 8 characters"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
+
+          <div className="field">
+            <label htmlFor="confirm">Confirm password</label>
+            <input
+              id="confirm"
+              type="password"
+              autoComplete="new-password"
+              required
+              placeholder="Re-enter password"
+              value={confirm}
+              onChange={(e) => setConfirm(e.target.value)}
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="auth-submit-btn"
+            disabled={submitting}
+          >
+            {submitting ? "Creating account..." : "Register"}
+          </button>
+        </form>
+
+        <GoogleAuthButton
+          onCredential={handleGoogleCredential}
+          onError={(msg) => setError(msg)}
+          text="signup_with"
+        />
+
+        <p className="auth-footer">
+          Already registered? <Link to="/login">Log in</Link>
+        </p>
+      </div>
     </div>
   );
 }
