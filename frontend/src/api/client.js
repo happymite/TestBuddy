@@ -93,15 +93,16 @@ export async function request(
   }
 
   if (!response.ok) {
-    if (response.status === 401 && token) {
+    const isUnverifiedStudent =
+      response.status === 403 && data?.code === "EMAIL_NOT_VERIFIED";
+
+    if ((response.status === 401 || isUnverifiedStudent) && token) {
       if (
         typeof window !== "undefined" &&
         (window.location.pathname.startsWith("/admin") ||
           window.location.pathname.startsWith("/teacher"))
       ) {
         localStorage.removeItem(ADMIN_TOKEN_KEY);
-        // P2 FIX: Call onUnauthorized for admin paths too — previously missing,
-        // which left admins stuck on a broken page instead of being redirected to login.
         onUnauthorized?.();
       } else {
         clearToken();

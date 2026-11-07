@@ -30,7 +30,12 @@ export function AuthProvider({ children }) {
       .then((data) => {
         if (!cancelled) setUser(data.user);
       })
-      .catch(() => {})
+      .catch(() => {
+        if (!cancelled) {
+          clearToken();
+          setUser(null);
+        }
+      })
       .finally(() => {
         if (!cancelled) setLoading(false);
       });
