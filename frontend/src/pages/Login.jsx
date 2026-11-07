@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, Navigate } from "react-router";
 import { useAuth } from "../context/AuthContext.jsx";
 import GoogleAuthButton from "../components/common/GoogleAuthButton.jsx";
+import { resendVerification } from "../api/auth.js";
 
 export default function Login() {
   const { user, loading, login, googleLogin, sessionExpired } = useAuth();
@@ -9,6 +10,9 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [unverifiedEmail, setUnverifiedEmail] = useState("");
+  const [resendMsg, setResendMsg] = useState("");
+  const [resending, setResending] = useState(false);
 
   if (loading) return <div className="page"><p>Loading...</p></div>;
   if (user) return <Navigate to="/dashboard" replace />;
@@ -16,17 +20,36 @@ export default function Login() {
   async function handleSubmit(event) {
     event.preventDefault();
     setError("");
+    setUnverifiedEmail("");
+    setResendMsg("");
     setSubmitting(true);
     try {
       await login(email, password);
     } catch (err) {
+      if (err.code === "EMAIL_NOT_VERIFIED") {
+        setUnverifiedEmail(email.trim().toLowerCase());
+      }
       setError(err.message || "Invalid credentials.");
       setSubmitting(false);
     }
   }
 
+  async function handleResend() {
+    setResending(true);
+    setResendMsg("");
+    try {
+      await resendVerification(unverifiedEmail);
+      setResendMsg("Verification email sent! Check your inbox.");
+    } catch {
+      setResendMsg("Could not resend. Please try again in a moment.");
+    } finally {
+      setResending(false);
+    }
+  }
+
   async function handleGoogleCredential(credential) {
     setError("");
+    setUnverifiedEmail("");
     await googleLogin(credential);
   }
 
@@ -50,6 +73,25 @@ export default function Login() {
           <p className="error" role="alert">
             {error}
           </p>
+        )}
+
+        {unverifiedEmail && (
+          <div style={{ marginBottom: "1rem" }}>
+            {resendMsg ? (
+              <p className="hint" role="status" style={{ color: "var(--color-primary)" }}>
+                {resendMsg}
+              </p>
+            ) : (
+              <button
+                className="auth-submit-btn"
+                onClick={handleResend}
+                disabled={resending}
+                style={{ width: "100%" }}
+              >
+                {resending ? "Sending…" : "Resend verification email"}
+              </button>
+            )}
+          </div>
         )}
 
         <form onSubmit={handleSubmit}>
@@ -84,7 +126,7 @@ export default function Login() {
             className="auth-submit-btn"
             disabled={submitting}
           >
-            {submitting ? "Signing in..." : "Log in"}
+            {submitting ? "Signing in…" : "Log in"}
           </button>
         </form>
 

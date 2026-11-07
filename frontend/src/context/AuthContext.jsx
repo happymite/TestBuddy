@@ -56,10 +56,9 @@ export function AuthProvider({ children }) {
   }
 
   async function register(name, email, password) {
+    // Returns { success, message } — no token (account unverified).
     const data = await authApi.register(name, email, password);
-    setToken(data.token);
-    setUser(data.user);
-    setSessionExpired(false);
+    return data;
   }
 
   function logout() {

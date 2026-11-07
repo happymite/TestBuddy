@@ -61,10 +61,20 @@ app.get("/api/health", (req, res) => {
   });
 });
 
+// 3 resend-verification emails per hour per IP to prevent abuse.
+const resendLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 3,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, message: "Too many verification emails sent. Try again in 1 hour." },
+});
+
 // Apply rate limiters before the route groups they protect.
 app.use("/api/auth/login", authLimiter);
 app.use("/api/auth/google", authLimiter);
 app.use("/api/admin/login", authLimiter);
+app.use("/api/auth/resend-verification", resendLimiter);
 
 app.use("/api/auth", authRoutes);
 app.use("/api/exams", examRoutes);

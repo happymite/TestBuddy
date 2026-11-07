@@ -3,6 +3,7 @@ import { Link, Navigate } from "react-router";
 import { useAuth } from "../context/AuthContext.jsx";
 import { homePathFor } from "../utils/homePath.js";
 import GoogleAuthButton from "../components/common/GoogleAuthButton.jsx";
+import { resendVerification } from "../api/auth.js";
 
 export default function Register() {
   const { user, loading, register, googleLogin } = useAuth();
@@ -12,6 +13,11 @@ export default function Register() {
   const [confirm, setConfirm] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  // After registration, switch to "check inbox" state.
+  const [registered, setRegistered] = useState(false);
+  const [registeredEmail, setRegisteredEmail] = useState("");
+  const [resendMsg, setResendMsg] = useState("");
+  const [resending, setResending] = useState(false);
 
   if (loading) return <p>Loading...</p>;
   if (user) return <Navigate to={homePathFor(user.role)} replace />;
@@ -45,15 +51,65 @@ export default function Register() {
     setSubmitting(true);
     try {
       await register(name.trim(), email.trim(), password);
+      setRegisteredEmail(email.trim().toLowerCase());
+      setRegistered(true);
     } catch (err) {
       setError(err.message);
       setSubmitting(false);
     }
   }
 
+  async function handleResend() {
+    setResending(true);
+    setResendMsg("");
+    try {
+      await resendVerification(registeredEmail);
+      setResendMsg("Verification email sent! Check your inbox.");
+    } catch {
+      setResendMsg("Could not resend. Please try again in a moment.");
+    } finally {
+      setResending(false);
+    }
+  }
+
   async function handleGoogleCredential(credential) {
     setError("");
     await googleLogin(credential);
+  }
+
+  if (registered) {
+    return (
+      <div className="auth-container">
+        <div className="auth-card">
+          <div className="auth-header">
+            <h1>Check your inbox</h1>
+            <p className="hint">
+              We sent a verification link to <strong>{registeredEmail}</strong>.
+              Click it to activate your account — the link expires in 30&nbsp;minutes.
+            </p>
+          </div>
+
+          {resendMsg && (
+            <p className="hint" role="status" style={{ color: "var(--color-primary)" }}>
+              {resendMsg}
+            </p>
+          )}
+
+          <button
+            className="auth-submit-btn"
+            onClick={handleResend}
+            disabled={resending}
+            style={{ marginTop: "1rem" }}
+          >
+            {resending ? "Sending…" : "Resend verification email"}
+          </button>
+
+          <p className="auth-footer" style={{ marginTop: "1.2rem" }}>
+            Already verified? <Link to="/login">Log in</Link>
+          </p>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -130,7 +186,7 @@ export default function Register() {
             className="auth-submit-btn"
             disabled={submitting}
           >
-            {submitting ? "Creating account..." : "Register"}
+            {submitting ? "Creating account…" : "Register"}
           </button>
         </form>
 

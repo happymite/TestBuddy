@@ -1,6 +1,8 @@
 ﻿import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { createHash, randomBytes } from "crypto";
 import { pool } from "../config/db.js";
+import { sendVerificationEmail } from "../services/emailService.js";
 
 const BCRYPT_ROUNDS = 10;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -20,8 +22,8 @@ function createToken(user) {
   });
 }
 
-function fail(res, status, message) {
-  return res.status(status).json({ success: false, message });
+function fail(res, status, message, extra = {}) {
+  return res.status(status).json({ success: false, message, ...extra });
 }
 
 const UNAVAILABLE_CODES = new Set([
@@ -54,6 +56,10 @@ function handleServerError(res, error, label) {
   }
 
   return fail(res, 500, "Something went wrong. Please try again.");
+}
+
+function sha256(str) {
+  return createHash("sha256").update(str).digest("hex");
 }
 
 export async function register(req, res) {
@@ -89,20 +95,41 @@ export async function register(req, res) {
 
     const passwordHash = await bcrypt.hash(password, BCRYPT_ROUNDS);
 
+    // Generate a secure single-use token; store only the SHA-256 hash.
+    const rawToken = randomBytes(32).toString("hex");
+    const tokenHash = sha256(rawToken);
+    const expiresAt = new Date(Date.now() + 30 * 60 * 1000); // 30 min
+
     const result = await pool.query(
-      `INSERT INTO public.users (name, email, password_hash)
-       VALUES ($1, $2, $3)
-       RETURNING id, name, email, role, created_at`,
-      [cleanName, cleanEmail, passwordHash]
+      `INSERT INTO public.users
+         (name, email, password_hash, email_verified,
+          verification_token_hash, verification_expires_at)
+       VALUES ($1, $2, $3, false, $4, $5)
+       RETURNING id, name, email, role`,
+      [cleanName, cleanEmail, passwordHash, tokenHash, expiresAt]
     );
 
     const user = result.rows[0];
 
-    return res.status(201).json({
+    // Send verification email – if SMTP not configured, delete the new account
+    // so the user isn't permanently locked out without a path to verify.
+    try {
+      await sendVerificationEmail(cleanEmail, rawToken);
+    } catch (emailErr) {
+      console.error("Registration – email send failed:", emailErr.message);
+      await pool.query("DELETE FROM public.users WHERE id = $1", [user.id]);
+      return fail(
+        res,
+        503,
+        "Could not send verification email. Please check your address and try again."
+      );
+    }
+
+    // HTTP 202 – account created but NOT yet authenticated.
+    return res.status(202).json({
       success: true,
-      message: "Registration successful.",
-      token: createToken(user),
-      user,
+      message:
+        "Account created! Check your inbox and click the verification link to activate it.",
     });
   } catch (error) {
     if (error.code === "23505") {
@@ -128,18 +155,18 @@ export async function login(req, res) {
 
     const cleanEmail = email.trim().toLowerCase();
 
-   if (
-  cleanEmail.length > 255 ||
-  Buffer.byteLength(password, "utf8") > 72 ||
-  !EMAIL_RE.test(cleanEmail)
-) {
-  return fail(res, 401, "Invalid email or password.");
-}
+    if (
+      cleanEmail.length > 255 ||
+      Buffer.byteLength(password, "utf8") > 72 ||
+      !EMAIL_RE.test(cleanEmail)
+    ) {
+      return fail(res, 401, "Invalid email or password.");
+    }
 
     const result = await pool.query(
-      `SELECT id, name, email, password_hash, role
-       FROM public.users
-       WHERE email = $1`,
+      `SELECT id, name, email, password_hash, role, email_verified
+         FROM public.users
+        WHERE email = $1`,
       [cleanEmail]
     );
 
@@ -153,6 +180,17 @@ export async function login(req, res) {
 
     if (!user || !match) {
       return fail(res, 401, "Invalid email or password.");
+    }
+
+    // Block login for unverified student accounts.
+    // Admins are always verified (created manually / Google).
+    if (user.role === "student" && !user.email_verified) {
+      return fail(
+        res,
+        403,
+        "Please verify your email before logging in. Check your inbox or use the resend option.",
+        { code: "EMAIL_NOT_VERIFIED" }
+      );
     }
 
     return res.status(200).json({
@@ -175,8 +213,8 @@ export async function me(req, res) {
   try {
     const result = await pool.query(
       `SELECT id, name, email, role, created_at
-       FROM public.users
-       WHERE id = $1`,
+         FROM public.users
+        WHERE id = $1`,
       [req.user.id]
     );
 

@@ -27,3 +27,18 @@ export function register(name, email, password) {
 export function getMe() {
   return request("/api/auth/me");
 }
+
+export function verifyEmail(token) {
+  return request(`/api/auth/verify-email?token=${encodeURIComponent(token)}`, {
+    method: "GET",
+    auth: false,
+  });
+}
+
+export function resendVerification(email) {
+  return request("/api/auth/resend-verification", {
+    method: "POST",
+    body: { email },
+    auth: false,
+  });
+}

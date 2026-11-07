@@ -16,6 +16,7 @@ const Login = lazy(() => import("./pages/Login.jsx"));
 const AdminLogin = lazy(() => import("./pages/AdminLogin.jsx"));
 const Register = lazy(() => import("./pages/Register.jsx"));
 const NotFound = lazy(() => import("./pages/NotFound.jsx"));
+const VerifyEmail = lazy(() => import("./pages/VerifyEmail.jsx"));
 const StudentDashboard = lazy(() => import("./pages/StudentDashboard.jsx"));
 const TakeExam = lazy(() => import("./pages/TakeExam.jsx"));
 const ExamResult = lazy(() => import("./pages/ExamResult.jsx"));
@@ -38,6 +39,7 @@ export default function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/verify-email" element={<VerifyEmail />} />
 
           {/* Guest/Practice Assessment Route (Distraction-Free) */}
           <Route path="/guest/attempts/:attemptId/take" element={<GuestTakeExam />} />
