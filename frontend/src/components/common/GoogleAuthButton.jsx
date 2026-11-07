@@ -6,6 +6,14 @@ export default function GoogleAuthButton({ onCredential, onError, text = "contin
   const [scriptLoaded, setScriptLoaded] = useState(Boolean(window.google?.accounts?.id));
   const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID?.trim();
 
+  const onCredentialRef = useRef(onCredential);
+  const onErrorRef = useRef(onError);
+
+  useEffect(() => {
+    onCredentialRef.current = onCredential;
+    onErrorRef.current = onError;
+  });
+
   useEffect(() => {
     if (window.google?.accounts?.id) return setScriptLoaded(true);
     const interval = setInterval(() => {
@@ -24,12 +32,12 @@ export default function GoogleAuthButton({ onCredential, onError, text = "contin
       window.google.accounts.id.initialize({
         client_id: clientId,
         callback: async (response) => {
-          if (!response?.credential) return onError?.("Google authentication failed.");
+          if (!response?.credential) return onErrorRef.current?.("Google authentication failed.");
           setLoading(true);
           try {
-            await onCredential(response.credential);
+            await onCredentialRef.current?.(response.credential);
           } catch (err) {
-            onError?.(err.message || "Google authentication failed.");
+            onErrorRef.current?.(err.message || "Google authentication failed.");
           } finally {
             setLoading(false);
           }
@@ -51,11 +59,11 @@ export default function GoogleAuthButton({ onCredential, onError, text = "contin
     } catch (err) {
       console.error("Google button init error:", err);
     }
-  }, [scriptLoaded, clientId, onCredential, onError, text]);
+  }, [scriptLoaded, clientId, text]);
 
   function handleFallbackClick() {
     if (!clientId) {
-      onError?.("Google Client ID is not configured yet in frontend/.env");
+      onErrorRef.current?.("Google Client ID is not configured yet in frontend/.env");
     }
   }
 
