@@ -55,11 +55,14 @@ export async function request(
     headers.Authorization = `Bearer ${token}`;
   }
   let response;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 15000);
 
   try {
     response = await fetch(`${BASE_URL}${path}`, {
       method,
       headers,
+      signal: controller.signal,
       body:
         body === undefined
           ? undefined
@@ -67,11 +70,19 @@ export async function request(
             ? body
             : JSON.stringify(body),
     });
-  } catch {
+  } catch (err) {
+    if (err.name === "AbortError") {
+      throw new ApiError(
+        "The server is taking too long to respond. Please try again.",
+        { code: "TIMEOUT_ERROR" },
+      );
+    }
     throw new ApiError(
       "Cannot reach the server. Check your connection and try again.",
       { code: "NETWORK_ERROR" },
     );
+  } finally {
+    clearTimeout(timer);
   }
 
   let data = null;

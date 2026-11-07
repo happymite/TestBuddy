@@ -24,8 +24,14 @@ export default function Register() {
 
   function validate() {
     const cleanName = name.trim();
+    const cleanEmail = email.trim().toLowerCase();
+    const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
     if (cleanName.length < 2 || cleanName.length > 50) {
       return "Name must be between 2 and 50 characters.";
+    }
+    if (!cleanEmail || !EMAIL_RE.test(cleanEmail)) {
+      return "Please enter a valid email address (e.g. name@student.com).";
     }
     if (password.length < 8) {
       return "Password must be at least 8 characters.";
@@ -54,7 +60,8 @@ export default function Register() {
       setRegisteredEmail(email.trim().toLowerCase());
       setRegistered(true);
     } catch (err) {
-      setError(err.message);
+      setError(err.message || "Registration failed. Please try again.");
+    } finally {
       setSubmitting(false);
     }
   }

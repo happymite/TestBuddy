@@ -1,16 +1,21 @@
 import { useEffect, useState } from "react";
-import { Link, useSearchParams } from "react-router";
+import { Link, useNavigate, useSearchParams } from "react-router";
 import { verifyEmail, resendVerification } from "../api/auth.js";
+import { useAuth } from "../context/AuthContext.jsx";
+import { homePathFor } from "../utils/homePath.js";
 
 // States: idle | verifying | success | already_verified | expired | invalid | error
 export default function VerifyEmail() {
   const [params] = useSearchParams();
   const token = params.get("token");
+  const navigate = useNavigate();
+  const { establishSession } = useAuth();
 
   const [status, setStatus] = useState("verifying");
   const [resendEmail, setResendEmail] = useState("");
   const [resendMsg, setResendMsg] = useState("");
   const [resending, setResending] = useState(false);
+  const [destination, setDestination] = useState("/dashboard");
 
   useEffect(() => {
     if (!token) {
@@ -18,9 +23,19 @@ export default function VerifyEmail() {
       return;
     }
 
+    let timer = null;
+
     verifyEmail(token)
       .then((data) => {
-        if (data?.alreadyVerified) {
+        if (data?.token && data?.user) {
+          establishSession?.(data.token, data.user);
+          const dest = homePathFor(data.user.role);
+          setDestination(dest);
+          setStatus("success");
+          timer = setTimeout(() => {
+            navigate(dest, { replace: true });
+          }, 1200);
+        } else if (data?.alreadyVerified) {
           setStatus("already_verified");
         } else {
           setStatus("success");
@@ -33,7 +48,11 @@ export default function VerifyEmail() {
           setStatus("invalid");
         }
       });
-  }, [token]);
+
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [token, establishSession, navigate]);
 
   async function handleResend(e) {
     e.preventDefault();
@@ -53,12 +72,10 @@ export default function VerifyEmail() {
     <div className="auth-container">
       <div className="auth-card">
         {status === "verifying" && (
-          <>
-            <div className="auth-header">
-              <h1>Verifying…</h1>
-              <p className="hint">Please wait while we confirm your email.</p>
-            </div>
-          </>
+          <div className="auth-header">
+            <h1>Verifying…</h1>
+            <p className="hint">Please wait while we confirm your email address.</p>
+          </div>
         )}
 
         {status === "success" && (
@@ -66,11 +83,15 @@ export default function VerifyEmail() {
             <div className="auth-header">
               <h1>Email verified ✓</h1>
               <p className="hint">
-                Your account is now active. You can log in.
+                Your account is active. Redirecting to your dashboard…
               </p>
             </div>
-            <Link to="/login" className="auth-submit-btn" style={{ display: "block", textAlign: "center", marginTop: "1rem" }}>
-              Go to Login
+            <Link
+              to={destination}
+              className="auth-submit-btn"
+              style={{ display: "block", textAlign: "center", marginTop: "1rem" }}
+            >
+              Enter Dashboard &rarr;
             </Link>
           </>
         )}
@@ -79,9 +100,13 @@ export default function VerifyEmail() {
           <>
             <div className="auth-header">
               <h1>Already verified</h1>
-              <p className="hint">Your email is already verified. Log in below.</p>
+              <p className="hint">Your email is already verified. You can log in below.</p>
             </div>
-            <Link to="/login" className="auth-submit-btn" style={{ display: "block", textAlign: "center", marginTop: "1rem" }}>
+            <Link
+              to="/login"
+              className="auth-submit-btn"
+              style={{ display: "block", textAlign: "center", marginTop: "1rem" }}
+            >
               Go to Login
             </Link>
           </>
@@ -90,9 +115,7 @@ export default function VerifyEmail() {
         {(status === "expired" || status === "invalid") && (
           <>
             <div className="auth-header">
-              <h1>
-                {status === "expired" ? "Link expired" : "Invalid link"}
-              </h1>
+              <h1>{status === "expired" ? "Link expired" : "Invalid link"}</h1>
               <p className="hint">
                 {status === "expired"
                   ? "This verification link has expired (links are valid for 30 minutes). Enter your email to get a new one."
@@ -122,7 +145,11 @@ export default function VerifyEmail() {
             </form>
 
             {resendMsg && (
-              <p className="hint" role="status" style={{ marginTop: "0.75rem", color: "var(--color-primary)" }}>
+              <p
+                className="hint"
+                role="status"
+                style={{ marginTop: "0.75rem", color: "var(--color-primary)" }}
+              >
                 {resendMsg}
               </p>
             )}
@@ -138,7 +165,7 @@ export default function VerifyEmail() {
             <div className="auth-header">
               <h1>Something went wrong</h1>
               <p className="hint">
-                We could not verify your email. Please try again or contact support.
+                We could not verify your email. Please try again or request a new link.
               </p>
             </div>
             <p className="auth-footer">
@@ -150,4 +177,3 @@ export default function VerifyEmail() {
     </div>
   );
 }
-

@@ -1,4 +1,5 @@
 import { createHash, randomBytes } from "crypto";
+import jwt from "jsonwebtoken";
 import { pool } from "../config/db.js";
 import { sendVerificationEmail } from "../services/emailService.js";
 
@@ -10,6 +11,18 @@ function sha256(str) {
 
 function fail(res, status, message, extra = {}) {
   return res.status(status).json({ success: false, message, ...extra });
+}
+
+function createToken(user) {
+  if (!process.env.JWT_SECRET) {
+    throw new Error("JWT_SECRET is not configured.");
+  }
+
+  return jwt.sign({ role: user.role }, process.env.JWT_SECRET, {
+    subject: String(user.id),
+    expiresIn: process.env.JWT_EXPIRES_IN || "4h",
+    algorithm: "HS256",
+  });
 }
 
 // ── verifyEmail ─────────────────────────────────────────────────────────────
@@ -28,7 +41,7 @@ export async function verifyEmail(req, res) {
 
     // FOR UPDATE prevents a race condition if the token is used twice simultaneously.
     const result = await client.query(
-      `SELECT id, email_verified, verification_expires_at
+      `SELECT id, name, email, role, email_verified, verification_expires_at
          FROM public.users
         WHERE verification_token_hash = $1
         FOR UPDATE`,
@@ -44,10 +57,18 @@ export async function verifyEmail(req, res) {
 
     if (user.email_verified) {
       await client.query("ROLLBACK");
+      const token = createToken(user);
       return res.status(200).json({
         success: true,
         alreadyVerified: true,
-        message: "Your email is already verified. You can log in.",
+        token,
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+        },
+        message: "Your email is already verified.",
       });
     }
 
@@ -69,9 +90,19 @@ export async function verifyEmail(req, res) {
     );
 
     await client.query("COMMIT");
+
+    const token = createToken(user);
+
     return res.status(200).json({
       success: true,
-      message: "Email verified! You can now log in.",
+      message: "Email verified successfully! Logging you in...",
+      token,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
     });
   } catch (err) {
     await client.query("ROLLBACK");

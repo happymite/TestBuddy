@@ -14,21 +14,28 @@ function createTransport() {
   const { SMTP_HOST, SMTP_USER, SMTP_PASS, SMTP_PORT, SMTP_SERVICE } =
     process.env;
 
+  const timeoutConfig = {
+    connectionTimeout: 8000, // 8s to establish TCP connection
+    greetingTimeout: 5000,   // 5s to wait for SMTP greeting
+    socketTimeout: 10000,    // 10s socket inactivity timeout
+  };
+
   if (SMTP_SERVICE) {
     if (!SMTP_USER || !SMTP_PASS) {
       throw new Error(
-        "Email service not configured. Set SMTP_USER and SMTP_PASS in .env"
+        "Email service not configured. Set SMTP_USER and SMTP_PASS in environment."
       );
     }
     return nodemailer.createTransport({
       service: SMTP_SERVICE,
+      ...timeoutConfig,
       auth: { user: SMTP_USER, pass: SMTP_PASS },
     });
   }
 
   if (!SMTP_HOST || !SMTP_USER || !SMTP_PASS) {
     throw new Error(
-      "Email service not configured. Set SMTP_HOST, SMTP_USER, SMTP_PASS in .env"
+      "Email service not configured. Set SMTP_HOST, SMTP_USER, SMTP_PASS in environment."
     );
   }
 
@@ -38,6 +45,7 @@ function createTransport() {
     host: SMTP_HOST,
     port,
     secure: port === 465,
+    ...timeoutConfig,
     auth: { user: SMTP_USER, pass: SMTP_PASS },
   });
 }

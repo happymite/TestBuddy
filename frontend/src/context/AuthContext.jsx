@@ -61,6 +61,12 @@ export function AuthProvider({ children }) {
     return data;
   }
 
+  function establishSession(token, userData) {
+    setToken(token);
+    setUser(userData);
+    setSessionExpired(false);
+  }
+
   function logout() {
     clearToken();
     setUser(null);
@@ -76,6 +82,7 @@ export function AuthProvider({ children }) {
         login,
         googleLogin,
         register,
+        establishSession,
         logout,
       }}
     >

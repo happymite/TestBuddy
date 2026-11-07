@@ -29,7 +29,8 @@ export default function Login() {
       if (err.code === "EMAIL_NOT_VERIFIED") {
         setUnverifiedEmail(email.trim().toLowerCase());
       }
-      setError(err.message || "Invalid credentials.");
+      setError(err.message || "Invalid email or password.");
+    } finally {
       setSubmitting(false);
     }
   }

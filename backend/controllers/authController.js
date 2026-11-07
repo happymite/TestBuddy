@@ -120,8 +120,8 @@ export async function register(req, res) {
       await pool.query("DELETE FROM public.users WHERE id = $1", [user.id]);
       return fail(
         res,
-        503,
-        "Could not send verification email. Please check your address and try again."
+        400,
+        "Could not send verification email. Please check that your email address is correct and try again."
       );
     }
 
