@@ -61,7 +61,7 @@ export async function verifyEmail(req, res) {
     await client.query(
       `UPDATE public.users
           SET email_verified           = true,
-              verified_at              = NOW(),
+              email_verified_at        = NOW(),
               verification_token_hash  = NULL,
               verification_expires_at  = NULL
         WHERE id = $1`,
